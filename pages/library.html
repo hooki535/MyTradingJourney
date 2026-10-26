@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Learning Library · MyTradingJourney</title>
+  <meta name="description" content="Your personal 21-book reading path, reflections, and practical learning actions.">
+  <link rel="stylesheet" href="../assets/shell.css">
+  <link rel="stylesheet" href="../assets/library.css?v=1">
+  <script defer src="../assets/library-data.js?v=1"></script>
+  <script defer src="../assets/library.js?v=1"></script>
+</head>
+<body data-page="library" data-depth="1" data-shell="none">
+  <a class="skip" href="#main">Skip to library</a>
+  <div class="learn-layout">
+    <aside class="learn-sidebar" aria-label="Journey navigation">
+      <a class="learn-brand" href="../index.html"><span>MJ</span><strong>MyTradingJourney<small>LEARN. TRADE. REFLECT. BUILD.</small></strong></a>
+      <p class="eyebrow">YOUR WORKSPACE</p>
+      <nav aria-label="Workspace"><a href="backtesting.html#sessions"><span aria-hidden="true">▦</span> Backtesting Lab</a><a href="backtesting.html#strategies"><span aria-hidden="true">⌘</span> Strategies</a><a href="backtesting.html#analytics/all"><span aria-hidden="true">▥</span> Analytics</a><a href="library.html" aria-current="page"><span aria-hidden="true">▤</span> Learning Library</a></nav>
+      <div class="sidebar-note"><strong>Read. Apply. Review.</strong><p>One useful action matters more than another finished chapter.</p></div>
+    </aside>
+    <main id="main" class="learn-main">
+      <div class="learn-top"><span>Personal development <span aria-hidden="true">/</span> <b>Learning Library</b></span><a href="backtesting.html#sessions">Open replay ↗</a></div>
+      <header class="learn-heading"><div><p class="eyebrow">YOUR NEXT CHAPTER</p><h1>Learning Library</h1><p>Build knowledge. Put it into practice. Keep the evidence.</p></div><div class="learn-actions"><button id="export-library" class="learn-button">Export reading backup</button><label class="learn-button">Import backup<input id="import-library" type="file" accept="application/json,.json" hidden></label></div></header>
+      <p class="storage-note">Reading records are saved in this browser on this device. They are separate from account sync and the backtesting workspace backup.</p>
+      <div id="library-message" role="status" aria-live="polite"></div>
+      <noscript><p>Enable JavaScript to view the reading path and save your notes.</p></noscript>
+      <section id="reading-stats" class="reading-stats" aria-label="Reading overview"></section>
+      <section id="reading-focus" class="reading-focus" aria-label="Next learning action"></section>
+      <div class="library-toolbar"><div><h2>Your reading path</h2><p>21 books · 5 areas of growth</p></div><div class="library-filters"><label><span>Search books</span><input id="book-search" type="search" placeholder="Title or author"></label><label><span>Category</span><select id="book-category"><option value="all">All categories</option></select></label><label><span>Status</span><select id="book-status"><option value="all">All statuses</option><option value="planned">To read</option><option value="reading">Reading</option><option value="paused">Paused</option><option value="completed">Finished</option></select></label></div></div>
+      <p id="result-count" class="result-count" aria-live="polite"></p>
+      <div id="book-grid" class="book-grid"></div>
+      <footer class="learn-footer">The order follows your personal reading path. Actions are original prompts for reflection; examine each idea against your own evidence.</footer>
+    </main>
+  </div>
+  <dialog id="book-dialog" class="book-dialog" aria-labelledby="book-title">
+    <form id="book-form">
+      <header><div><p id="book-author" class="eyebrow"></p><h2 id="book-title"></h2></div><button type="button" id="close-book" class="close-button" aria-label="Close book notes">×</button></header>
+      <p id="book-prompt" class="book-prompt"></p>
+      <div class="book-fields">
+        <label>Reading status<select name="status"><option value="planned">To read</option><option value="reading">Reading</option><option value="paused">Paused</option><option value="completed">Finished</option></select></label>
+        <label>Current chapter or page<input name="chapter" maxlength="20000" placeholder="e.g. Chapter 3 · page 42"></label>
+        <label class="wide">Personal notes<textarea name="notes" rows="4" maxlength="20000"></textarea></label>
+        <label class="wide">Three key takeaways, in your own words<textarea name="takeaways" rows="3" maxlength="20000"></textarea></label>
+        <label class="wide">An idea you question or disagree with<textarea name="question" rows="2" maxlength="20000"></textarea></label>
+        <label class="wide">One practical action<textarea name="action" rows="2" maxlength="20000" placeholder="What will you do, and what evidence will show it helped?"></textarea></label>
+        <label>Review date<input name="reviewDate" type="date"></label>
+        <label>Related session, strategy, or project<input name="related" maxlength="20000" placeholder="Use the name from your workspace"></label>
+      </div>
+      <p id="book-error" role="alert"></p>
+      <div class="dialog-actions"><span>Saved on this device</span><button type="button" id="cancel-book" class="learn-button">Cancel</button><button type="submit" class="learn-button primary">Save learning notes</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -4,7 +4,7 @@
   if (document.body.dataset.shell === 'none') return;
   const root=document.body.dataset.depth==='1'?'../':'', workspace=root+'pages/backtesting.html';
   const header=document.createElement('header');header.className='topbar';
-  header.innerHTML='<div class="wrap nav-row"><a class="brand" href="'+root+'index.html"><span class="brand-mark">MJ</span><span class="brand-name">MyTradingJourney</span></a><nav class="nav-links" aria-label="Primary"><a href="'+workspace+'#sessions" aria-current="page">Workspace</a></nav><div class="nav-actions" id="replay-account"><a class="btn btn-quiet" href="'+root+'pages/login.html">Log in</a></div></div>';
+  header.innerHTML='<div class="wrap nav-row"><a class="brand" href="'+root+'index.html"><span class="brand-mark">MJ</span><span class="brand-name">MyTradingJourney</span></a><nav class="nav-links" aria-label="Primary"><a href="'+workspace+'#sessions" '+(document.body.dataset.page==='backtesting'?'aria-current="page"':'')+'>Workspace</a><a href="'+root+'pages/library.html" '+(document.body.dataset.page==='library'?'aria-current="page"':'')+'>Learning Library</a></nav><div class="nav-actions" id="replay-account"><a class="btn btn-quiet" href="'+root+'pages/login.html">Log in</a></div></div>';
   document.body.prepend(header);
   window.Cloud?.ready.then(user=>{
     if(!user)return;
@@ -14,3 +14,4 @@
     actions.append(name,logout);
   }).catch(()=>{});
 })();
+
