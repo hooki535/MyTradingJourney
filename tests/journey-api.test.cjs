@@ -31,3 +31,8 @@ test('uploads use an immutable owner folder and preferences stay in memory',asyn
  assert.equal(calls.find(c=>c[0]==='upload')[3].upsert,false);
  let changed=0;store.onChange=()=>changed++;store.setItem('onepercent:backtest-desk:v1','{}');assert.equal(changed,1);assert.equal(store.getItem('onepercent:backtest-desk:v1'),'{}');
 });
+
+test('reader record lookups filter by owner and exact record id',async()=>{
+ const {api,calls}=setup();await api.get('settings:reader:abc');assert.ok(calls.some(c=>c[0]==='eq'&&c[1]==='user_id'&&c[2]==='owner-a'));assert.ok(calls.some(c=>c[0]==='eq'&&c[1]==='id'&&c[2]==='settings:reader:abc'));
+ const signedOut=setup({user:null});await assert.rejects(signedOut.api.get('settings:reader:abc'),/Sign in/);
+});

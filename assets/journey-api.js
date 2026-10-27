@@ -9,6 +9,7 @@
   function setReturn(page,hash='') { if (!['journey','library','reader','backtesting'].includes(page)) return; try { sessionStorage.setItem('op-return',JSON.stringify({page,hash:/^#[A-Za-z0-9/_-]*$/.test(hash)?hash:'',at:Date.now()})); } catch (_) {} }
   async function account() { const u=await ready; if (!u) throw Error('Sign in to save and open your private records.'); return u; }
   async function list(kind) { const u=await account(); let q=client.from('journey_records').select('*').eq('user_id',u.id).order('updated_at',{ascending:false}); if(kind)q=q.eq('kind',kind); const {data,error}=await q; if(error)throw error;return data.filter(r=>!r.id.startsWith('settings:')); }
+  async function get(id) { const u=await account();const {data,error}=await client.from('journey_records').select('*').eq('user_id',u.id).eq('id',id).maybeSingle();if(error)throw error;return data; }
   async function save(id,kind,payload,revision=null) {
     const u=await account(); const row={user_id:u.id,id,kind,payload,revision:revision===null?1:revision+1,updated_at:new Date().toISOString()};
     const q=revision===null?client.from('journey_records').insert(row):client.from('journey_records').update(row).eq('user_id',u.id).eq('id',id).eq('revision',revision);
@@ -27,7 +28,7 @@
   async function asset(path) { const u=await account();if(!path.startsWith(u.id+'/'))throw Error('File is not part of your account.');const {data,error}=await client.storage.from('journey-private').createSignedUrl(path,3600);if(error)throw error;return data.signedUrl; }
   async function dropFile(path) {if(!path)return;const u=await account();if(!path.startsWith(u.id+'/'))throw Error('Invalid file owner.');const {error}=await client.storage.from('journey-private').remove([path]);if(error)throw error;}
   function login(page='journey',hash=location.hash) {setReturn(page,hash);location.href='login.html';}
-  window.JourneyAPI={client,ready,list,save,remove,upload,asset,dropFile,login};
+  window.JourneyAPI={client,ready,list,get,save,remove,upload,asset,dropFile,login};
   window.Cloud={client,ready,setReturn};
   client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){user=null;location.reload();}});
 })();

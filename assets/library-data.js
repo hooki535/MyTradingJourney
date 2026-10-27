@@ -32,7 +32,7 @@
     ['ego-is-the-enemy','Ego Is the Enemy','Ryan Holiday',0,'Review one decision where protecting your ego distracted you from learning.'],
     ['richest-man-in-babylon','The Richest Man in Babylon','George S. Clason',4,'Write a practical saving rule and review how it fits your income and essential expenses.']
   ];
-  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1,cover:id+'.jpg'}));
+  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1,cover:id+'.webp'}));
   const key = 'mytradingjourney:library:v1';
   const fields = ['status','chapter','notes','takeaways','question','action','reviewDate','related'];
   const statuses = ['planned','reading','paused','completed'];
@@ -78,6 +78,10 @@
     storage.setItem(key,JSON.stringify(state));
     return state;
   }
-  const freeSources={almanack:{title:"Official free PDF",url:"https://navalmanack.s3.amazonaws.com/Eric-Jorgenson_The-Almanack-of-Naval-Ravikant_Final.pdf",source:"https://www.navalmanack.com/home"},reminiscences:{title:"Read free at Project Gutenberg",url:"https://www.gutenberg.org/cache/epub/60979/pg60979-images.html",source:"https://www.gutenberg.org/ebooks/60979"}};
+  const freeSources={
+    almanack:{title:'Download official free PDF',url:'https://navalmanack.s3.amazonaws.com/Eric-Jorgenson_The-Almanack-of-Naval-Ravikant_Final.pdf',source:'https://www.navalmanack.com/',label:'Navalmanack · official free edition',pdf:false},
+    reminiscences:{title:'Free PDF · Project Gutenberg',url:'../assets/free-books/reminiscences.pdf',source:'https://www.gutenberg.org/ebooks/60979',label:'Project Gutenberg · complete transcription',pdf:true},
+    'richest-man-in-babylon':{title:'Free PDF · 1926 edition',url:'../assets/free-books/richest-man-in-babylon.pdf',source:'https://www.globalgreyebooks.com/book-page/richest-man-in-babylon-ebook.html',label:'Public-domain text · 1926 edition',pdf:true}
+  };
   return {books,freeSources,groups,key,fields,statuses,blank,record,validate,empty,read,save,restore};
 });
