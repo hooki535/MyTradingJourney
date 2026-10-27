@@ -33,6 +33,6 @@ test('invalid imports, corrupted storage, and quota errors never silently reset 
   assert.throws(()=>L.save(blocked,'mindset',L.blank(),L.blank()),/Quota/);
 });
 test('catalog contains the complete requested path with stable unique identifiers',()=>{
-  assert.equal(L.books.length,22); assert.equal(new Set(L.books.map(b=>b.id)).size,22);
-  assert.deepEqual(L.groups.map((_,g)=>L.books.filter(b=>b.group===g).length),[6,4,4,3,5]);
+  assert.equal(L.books.length,24); assert.equal(new Set(L.books.map(b=>b.id)).size,24);
+  assert.deepEqual(L.groups.map((_,g)=>L.books.filter(b=>b.group===g).length),[7,4,4,3,6]);
 });

@@ -28,9 +28,11 @@
     ['lean-startup','The Lean Startup','Eric Ries',4,'Test one small product assumption with an observable outcome.'],
     ['shoe-dog','Shoe Dog','Phil Knight',4,'Write down a business uncertainty and one action that could reduce it.'],
     ['millionaire-fastlane','The Millionaire Fastlane','MJ DeMarco',4,'Evaluate a business idea by the customer problem and evidence of demand.'],
-    ['ten-times-rule','The 10X Rule','Grant Cardone',0,'Choose a concrete goal, test your assumptions, and plan sustainable actions.']
+    ['ten-times-rule','The 10X Rule','Grant Cardone',0,'Choose a concrete goal, test your assumptions, and plan sustainable actions.'],
+    ['ego-is-the-enemy','Ego Is the Enemy','Ryan Holiday',0,'Review one decision where protecting your ego distracted you from learning.'],
+    ['richest-man-in-babylon','The Richest Man in Babylon','George S. Clason',4,'Write a practical saving rule and review how it fits your income and essential expenses.']
   ];
-  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1}));
+  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1,cover:id+'.jpg'}));
   const key = 'mytradingjourney:library:v1';
   const fields = ['status','chapter','notes','takeaways','question','action','reviewDate','related'];
   const statuses = ['planned','reading','paused','completed'];
