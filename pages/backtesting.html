@@ -4,9 +4,9 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Backtesting · MyTradingJourney</title>
   <meta name="description" content="Build a strategy, replay archived candles and review simulated trades in your private browser workspace.">
-  <script src="../assets/theme.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../assets/cloud.js"></script>
+  <script src="../assets/theme.js"></script><script>document.documentElement.dataset.theme="light";</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+  <script src="../assets/journey-api.js?v=2"></script>
   <script src="../assets/market-config.js"></script>
   <link rel="stylesheet" href="../assets/shell.css"><link rel="stylesheet" href="../assets/components.css">
   <link rel="stylesheet" href="../assets/backtesting.css">
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../assets/backtesting-tools.css?v=tvtools1">
 <link rel="stylesheet" href="../assets/backtest-settings-dialog.css?v=settings1">
   <link rel="stylesheet" href="../assets/backtesting-studio.css?v=journey1">
-  <link rel="stylesheet" href="../assets/backtesting-light.css?v=light1">
+  <link rel="stylesheet" href="../assets/backtesting-light.css?v=light1"><link rel="stylesheet" href="../assets/journey.css?v=2">
 </head>
 <body data-page="backtesting" data-depth="1" data-shell="nav">
   <div class="bt-layout">
@@ -28,18 +28,18 @@
       <a class="bt-side-link" href="#analytics/all" data-section="analytics" title="Backtest analytics">▥ <span>Analytics</span></a>
       <a class="bt-side-link" href="library.html">▤ <span>Learning Library</span></a>
       <button class="bt-side-link" id="bt-guide">▷ <span>Replay guide</span></button>
-      <div class="bt-side-bottom"><span class="bt-status-dot"></span> Simulation workspace<p id="bt-storage-label">Saved in this browser</p><p>Research results stay separate from your live trading journal.</p><button id="bt-backup" class="bt-text-button">Export workspace backup ↗</button><label class="bt-text-button bt-restore">Restore backup<input type="file" id="bt-restore" accept=".json,application/json" hidden></label></div>
+      <div class="bt-side-bottom"><span class="bt-status-dot"></span> Simulation workspace<p id="bt-storage-label">Saved to your account</p><p>Research results stay separate from your live trading journal.</p><button id="bt-import-legacy" class="bt-text-button">Import older browser workspace</button><button id="bt-backup" class="bt-text-button">Export workspace backup ↗</button><label class="bt-text-button bt-restore">Restore backup<input type="file" id="bt-restore" accept=".json,application/json" hidden></label></div>
     </aside>
     <main class="bt-main" id="main">
-      <div class="bt-page-top"><a href="../index.html">Home</a><span>›</span><strong>Backtesting</strong><small>SIMULATED RESEARCH</small></div>
-      <div class="bt-sync-bar" aria-live="polite"><span id="bt-sync-status">Guest · sessions saved on this device</span><div class="bt-actions"><a id="bt-sync-login" class="bt-button small">Sign in to sync</a><button id="bt-sync-retry" class="bt-button small" hidden>Retry sync</button><button id="bt-sync-load" class="bt-button small" hidden>Load online workspace</button></div></div>
+      <div class="bt-page-top"><a href="journey.html#home">Overview</a><span>›</span><strong>Backtesting</strong><small>SIMULATED RESEARCH</small></div>
+      <div class="bt-sync-bar" aria-live="polite"><span id="bt-sync-status">Sign in to open your database workspace</span><div class="bt-actions"><a id="bt-sync-login" class="bt-button small">Sign in to sync</a><button id="bt-sync-retry" class="bt-button small" hidden>Retry sync</button><button id="bt-sync-load" class="bt-button small" hidden>Load online workspace</button></div></div>
       <div id="bt-app"><div class="bt-empty">Loading your research workspace…</div></div>
       <div class="bt-mobile-storage"><button id="bt-mobile-backup" class="bt-button small">↓ Workspace backup</button><label class="bt-button small" for="bt-restore">Restore backup</label></div>
     </main>
   </div>
   <dialog id="bt-dialog" class="bt-dialog" aria-labelledby="bt-dialog-title"><div class="bt-dialog-body" id="bt-dialog-body"></div></dialog>
   <div id="bt-toast" class="bt-toast" role="status" aria-live="polite" hidden></div>
-  <script src="../assets/backtest-studies.js?v=days1"></script>
+  <script src="../assets/journey-shell.js?v=2"></script><script src="../assets/backtest-studies.js?v=days1"></script>
   <script src="../assets/backtest-drawing-suite.js?v=settings1"></script>
 <script src="../assets/backtest-settings-schemas.js?v=settings1"></script>
   <script src="../assets/backtest-settings-model.js?v=settings1"></script>
@@ -58,7 +58,7 @@
   <script src="../assets/backtest-objects.js?v=suite2"></script>
   <script src="../assets/backtest-settings-dialog.js?v=settings1"></script>
   <script src="../assets/backtesting.js?v=journey1"></script>
-  <script src="../assets/shell.js?v=journey1"></script>
+  
 </body>
 </html>
 

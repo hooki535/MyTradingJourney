@@ -1,4 +1,1 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyTradingJourney</title></head>
-<body><p><a id="workspace" href="pages/backtesting.html#sessions">Open the backtesting workspace</a></p>
-<script>location.replace('pages/backtesting.html'+location.search+(location.hash||'#sessions'));</script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MyTradingJourney</title></head><body><p><a href="pages/journey.html#home">Open MyTradingJourney</a></p><script>const replay=/^#(?:sessions|session|strategies|challenges|analytics)(?:\/|$)/.test(location.hash);location.replace((replay?'pages/backtesting.html':'pages/journey.html')+location.search+(location.hash||'#home'));</script></body></html>

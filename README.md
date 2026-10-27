@@ -1,6 +1,6 @@
 # MyTradingJourney
 
-Standalone historical replay, simulated trading, drawing tools, strategies and analytics.
+One personal workspace for historical replay, simulated trading, screenshot journaling, learning, private PDFs, mindset, building and reviews.
 
 - Website: https://hooki535.github.io/MyTradingJourney/
 - Original website: https://hooki535.github.io/TheOnePercent/
@@ -39,3 +39,7 @@ This repository does not contain the separately licensed TradingView Advanced Ch
 ## Name and migration
 
 MyTradingJourney continues the existing backtesting app, including the Research Lab upgrade. Storage identities and the historical-data service are deliberately unchanged. The old repository remains available during the website-address transition. Enable GitHub Pages from main at the repository root to publish this site.
+
+## Unified account workspace
+
+Open the site home for the overview and shared navigation. Reading and personal records save to Supabase, with private file storage and a PDF reader. Backtesting keeps its existing account data and replay engine while using database saves rather than browser record persistence. See [account workspace notes](docs/account-workspace.md) for imports, validation and rollback.

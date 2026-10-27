@@ -126,7 +126,7 @@
      Only a known page + a plain #hash can be stored, so it can't be abused as
      an open redirect. */
   const RETURN_KEY = "op-return";
-  const RETURN_PAGES = ["backtesting"];
+  const RETURN_PAGES = ["backtesting", "journey", "library", "reader"];
   function setReturn(pageName, hash) {
     if (RETURN_PAGES.indexOf(pageName) < 0) return;
     if (hash && !/^#[A-Za-z0-9/_-]*$/.test(hash)) hash = "";
@@ -153,7 +153,7 @@
       // Already signed in (e.g. just back from Google) — leave the login/sign-up pages.
       if (page === "login" || page === "sign-up") {
         const back = takeReturn();
-        location.replace(back ? root + "pages/" + back : go("backtesting") + "#sessions");
+        location.replace(back ? root + "pages/" + back : go("journey") + "#home");
         return user;
       }
       await pull();
