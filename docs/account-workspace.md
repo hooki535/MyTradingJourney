@@ -21,3 +21,13 @@ Old browser records are never deleted. Library and replay each provide an explic
 ## Rollback
 
 Revert the website commit to restore the previous pages and storage adapter. Keep the new table and bucket so records/files are retained. Export account and legacy browser backups before any future destructive cleanup. This upgrade creates no new paid Supabase project.
+
+## Partial exits, themes and uploads
+
+Partial exits are explicit next-open requests with 25/50/75 percent and custom quantities. Brackets have opening-gap priority, fees allocate by exited quantity, and each exit records a leg and reason. The remaining bracket stays live, including on the partial-exit bar. Win rate and strategy counts group legs into completed positions; cashflow reports retain each exit date. Actions round-trip through existing single/portfolio backups. Legacy full-close review keys are preserved.
+
+Appearance is stored as `journey_records` id `settings:appearance` and filtered from document lists. The sidebar toggle applies both CSS tokens and the live chart palette without resetting replay. No browser appearance record is written. The vault accepts mixed PDF/image attachments, and editing can remove individual attachments after a successful database save.
+
+The library includes The 10X Rule, batch PDF import, automatic first-page covers and PDF page counts. It links the official Navalmanack free PDF and Project Gutenberg edition of Reminiscences. Private user PDFs are never included in this source repository.
+
+Validation: 131 Node tests pass. Browser QA covers mixed attachment add/remove, theme changes, partial-close UI/database restoration, PDF reading, notes and account persistence with a test service. Real private book imports require the existing signed-in upload flow. A proposed temporary backend importer was rejected by automatic approval review and was not deployed.

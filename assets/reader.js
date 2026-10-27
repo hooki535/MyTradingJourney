@@ -24,7 +24,7 @@ try{
  const params=new URLSearchParams(location.search),book=params.get('book'),doc=params.get('doc');
  const id=book?'book:'+book:doc;row=(await A.list(book?'book':'document')).find(r=>r.id===id);
  if(!row)throw Error('This book or document is not in your account.');
- const path=book?row.payload.pdfPath:row.payload.files?.find(f=>f.type==='application/pdf')?.path;
+ const path=book?row.payload.pdfPath:(row.payload.files?.[Number(params.get('file')||0)]?.type==='application/pdf'?row.payload.files[Number(params.get('file')||0)]:row.payload.files?.find(f=>f.type==='application/pdf'))?.path;
  if(!path)throw Error('Upload your own PDF from the book’s notes or the Document Vault first.');
  $('reader-title').textContent=row.payload.title||JourneyLibrary.books.find(b=>b.id===book)?.title||'My document';
  const url=await A.asset(path);$('reader-download').href=url;$('reader-download').hidden=false;status('Opening your PDF…');

@@ -36,6 +36,7 @@
   B.placeOrder(active(s),order,equity);active(s).pending.submittedAt=s.clock;const event=active(s).actions.at(-1);s.actions.push({at:s.clock,market:s.activeSymbol,kind:'order',order:{...event.order}});
  }
  function requestClose(s){if(!multi(s))return B.requestClose(s);B.requestClose(active(s));s.actions.push({at:s.clock,market:s.activeSymbol,kind:'close'});}
+ function requestPartialClose(s,quantity){if(!multi(s))return B.requestPartialClose(s,quantity);B.requestPartialClose(active(s),quantity);s.actions.push({at:s.clock,market:s.activeSymbol,kind:'partial-close',quantity:Number(quantity)});}
  function cancelOrder(s){if(!multi(s))return B.cancelOrder(s);B.cancelOrder(active(s));s.actions.push({at:s.clock,market:s.activeSymbol,kind:'cancel'});}
  function metrics(s){if(!multi(s))return B.metrics(s);const u=unrealized(s),m=B.metrics({...s,balance:s.balance+u,position:null,challenge:null});return {...m,unrealized:u};}
  function snapshot(s){
@@ -47,7 +48,7 @@
   if(raw?.kind!=='portfolio')return B.restore(raw);
   if(!/^[\w-]{1,100}$/.test(raw.id)||!Number.isInteger(raw.clock)||!Array.isArray(raw.actions)||raw.actions.length>30000)throw Error('Invalid multi-pair session.');
   const s=createPortfolio({...raw,startTime:raw.initialTime},raw.markets);
-  for(const event of raw.actions){if(!event||!Number.isInteger(event.at)||event.at<s.clock||event.at>raw.clock||!s.markets.some(m=>m.symbol===event.market))throw Error('Invalid multi-pair action.');while(s.clock<event.at){if(!step(s))throw Error('Action is outside shared history.');}if(s.clock!==event.at)throw Error('Action does not match a replay candle.');s.activeSymbol=event.market;if(event.kind==='order')placeOrder(s,event.order);else if(event.kind==='close')requestClose(s);else if(event.kind==='cancel')cancelOrder(s);else throw Error('Unknown multi-pair action.');}
+  for(const event of raw.actions){if(!event||!Number.isInteger(event.at)||event.at<s.clock||event.at>raw.clock||!s.markets.some(m=>m.symbol===event.market))throw Error('Invalid multi-pair action.');while(s.clock<event.at){if(!step(s))throw Error('Action is outside shared history.');}if(s.clock!==event.at)throw Error('Action does not match a replay candle.');s.activeSymbol=event.market;if(event.kind==='order')placeOrder(s,event.order);else if(event.kind==='close')requestClose(s);else if(event.kind==='partial-close')requestPartialClose(s,event.quantity);else if(event.kind==='cancel')cancelOrder(s);else throw Error('Unknown multi-pair action.');}
   while(s.clock<raw.clock){if(!step(s))throw Error('Saved clock is outside shared history.');}if(s.clock!==raw.clock)throw Error('Invalid saved portfolio clock.');
   for(const m of s.markets){const saved=raw.markets.find(x=>x.symbol===m.symbol);m.annotations=B.cleanAnnotations(saved.annotations);m.drawings=Array.isArray(saved.drawings)?saved.drawings.filter(n=>Number.isFinite(n)&&n>0).slice(0,30):[];m.indicators=Array.isArray(saved.indicators)?saved.indicators.filter(x=>['SMA20','EMA20','EMA50','EMA200','BB20','RSI14','ATR14','HIGHLOW52','AC','AD','ALMA9','AROON14','ADX14','AVGPRICE','AO','BOP','BBP20','DAYBREAK','WEEKDAYS'].includes(x)).slice(0,20):[];}
   if(!s.markets.some(m=>m.symbol===raw.activeSymbol))throw Error('Invalid active pair.');s.viewTimeframe=typeof raw.viewTimeframe==='string'?raw.viewTimeframe.slice(0,12):undefined;s.activeSymbol=raw.activeSymbol;s.id=raw.id;s.notes=String(raw.notes||'').slice(0,10000);s.createdAt=String(raw.createdAt||s.createdAt);s.updatedAt=String(raw.updatedAt||s.updatedAt);
@@ -55,5 +56,6 @@
   return s;
  }
  function selectMarket(s,symbol){if(!multi(s)||!s.markets.some(m=>m.symbol===symbol))throw Error('Pair is not in this session.');s.activeSymbol=symbol;return active(s);}
- return {...B,createPortfolio,selectMarket,activeMarket:active,marketData:(s,symbol)=>multi(s)?s.markets.find(m=>m.symbol===symbol):s,finished,step,placeOrder,requestClose,cancelOrder,metrics,snapshot,restore,unrealized,challengeState};
+ return {...B,createPortfolio,selectMarket,activeMarket:active,marketData:(s,symbol)=>multi(s)?s.markets.find(m=>m.symbol===symbol):s,finished,step,placeOrder,requestClose,requestPartialClose,cancelOrder,metrics,snapshot,restore,unrealized,challengeState};
 });
+

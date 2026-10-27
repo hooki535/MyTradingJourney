@@ -4,8 +4,10 @@
  window.BacktestChart=function(host,onCrosshair,onLevel,callbacks={}){
   const L=window.LightweightCharts,Lab=window.BacktestLab;
   if(!L)throw Error('TradingView chart library could not be loaded. Reload the page.');
-  const css=getComputedStyle(document.body),color=n=>css.getPropertyValue('--bt-'+n).trim();
+  const color=n=>getComputedStyle(document.body).getPropertyValue('--bt-'+n).trim();
   const chart=L.createChart(host,{autoSize:true,layout:{background:{type:'solid',color:color('card')},textColor:color('muted'),attributionLogo:true,fontSize:11},grid:{vertLines:{color:color('line')},horzLines:{color:color('line')}},timeScale:{timeVisible:true,secondsVisible:false,rightOffset:8},rightPriceScale:{borderColor:color('line')},crosshair:{mode:L.CrosshairMode.Normal}});
+  function applyTheme(){chart.applyOptions({layout:{background:{type:'solid',color:color('card')},textColor:color('muted')},grid:{vertLines:{color:color('line')},horzLines:{color:color('line')}},rightPriceScale:{borderColor:color('line')}});candles.applyOptions(['line','area'].includes(renderKind)?{color:color('up'),lineColor:color('up')}:{upColor:renderKind==='hollow'?'transparent':color('up'),downColor:color('down'),wickUpColor:color('up'),wickDownColor:color('down')});repaint();}
+  window.addEventListener?.('themechange',applyTheme);
   function priceSeries(kind){const types={candles:L.CandlestickSeries,hollow:L.CandlestickSeries,bars:L.BarSeries,line:L.LineSeries,area:L.AreaSeries};return chart.addSeries(types[kind]||L.CandlestickSeries,['line','area'].includes(kind)?{color:color('up'),lineColor:color('up'),lineWidth:2,topColor:'#32cf9135',bottomColor:'#32cf9102'}:{upColor:kind==='hollow'?'transparent':color('up'),downColor:color('down'),borderVisible:kind==='hollow',borderUpColor:color('up'),borderDownColor:color('down'),wickUpColor:color('up'),wickDownColor:color('down')});}
   let renderKind='candles',candles=priceSeries(renderKind);
   const ma=chart.addSeries(L.LineSeries,{color:'#a390ff',lineWidth:2,priceLineVisible:false,lastValueVisible:false});
@@ -206,7 +208,8 @@
    zoom(){const range=ts.getVisibleLogicalRange();if(range){const center=(range.from+range.to)/2,half=(range.to-range.from)/4;ts.setVisibleLogicalRange({from:center-half,to:center+half});}},
    fit(){ts.fitContent();},
    async image(){const canvas=chart.takeScreenshot();if(svg){const data=new XMLSerializer().serializeToString(svg),url=URL.createObjectURL(new Blob([data],{type:'image/svg+xml'})),img=new Image();try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);}finally{URL.revokeObjectURL(url);}}return canvas.toDataURL('image/png');},
-   destroy(){observer?.disconnect();if(frame)cancelAnimationFrame(frame);markers?.detach();chart.remove();}
+   destroy(){window.removeEventListener?.('themechange',applyTheme);observer?.disconnect();if(frame)cancelAnimationFrame(frame);markers?.detach();chart.remove();}
   };
  };
 })();
+

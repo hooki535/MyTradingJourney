@@ -23,7 +23,7 @@
     $('result-count').textContent = matches.length+' of '+L.books.length+' books';
     $('book-grid').innerHTML = matches.map(b => {
       const v = value(b.id);
-      return '<article class="book-card"><div class="book-cover-wrap tone-'+b.group+'"><img class="book-cover" data-cover="'+b.id+'" src="../assets/book-covers/'+(b.id.startsWith('custom-')?'personal':b.id)+'.svg" alt="Designed cover for '+esc(b.title)+'" loading="lazy"></div><div class="book-info"><div class="book-meta"><span>'+esc(L.groups[b.group])+'</span><span class="reading-status '+v.status+'">'+labels[v.status]+'</span></div><h3>'+esc(b.title)+'</h3><p class="author">'+esc(b.author)+'</p><p class="book-action">'+esc(v.action || b.prompt)+'</p><div class="book-card-bottom"><span>'+esc(v.chapter || 'Start at your own pace')+'</span><button class="learn-button" data-book="'+b.id+'" aria-label="Open notes for '+esc(b.title)+'">'+(state.records[b.id] ? 'View notes' : 'Start learning')+' ↗</button>'+(v.pdfPath?'<a class="learn-button primary" href="reader.html?book='+encodeURIComponent(b.id)+'">Read PDF</a>':'')+'</div></div></article>';
+      return '<article class="book-card"><div class="book-cover-wrap tone-'+b.group+'"><img class="book-cover" data-cover="'+b.id+'" src="../assets/book-covers/'+(b.id.startsWith('custom-')?'personal':b.id)+'.svg" alt="Designed cover for '+esc(b.title)+'" loading="lazy"></div><div class="book-info"><div class="book-meta"><span>'+esc(L.groups[b.group])+'</span><span class="reading-status '+v.status+'">'+labels[v.status]+'</span></div><h3>'+esc(b.title)+'</h3><p class="author">'+esc(b.author)+'</p><p class="book-action">'+esc(v.action || b.prompt)+'</p><div class="book-card-bottom"><span>'+esc(v.pdfPages?v.pdfPages+' PDF pages uploaded':v.chapter || 'Start at your own pace')+'</span><button class="learn-button" data-book="'+b.id+'" aria-label="Open notes for '+esc(b.title)+'">'+(state.records[b.id] ? 'View notes' : 'Start learning')+' ↗</button>'+(L.freeSources[b.id]?'<a class="source-link" href="'+L.freeSources[b.id].url+'" target="_blank" rel="noopener">'+L.freeSources[b.id].title+' ↗</a>':'')+(v.pdfPath?'<a class="learn-button primary" href="reader.html?book='+encodeURIComponent(b.id)+'">Read PDF</a>':'')+'</div></div></article>';
     }).join('') || '<p class="empty-books">No books match these filters. Try another title, category, or status.</p>'; renderCovers();
   }
   async function renderCovers(){for(const img of document.querySelectorAll('[data-cover]')){const path=value(img.dataset.cover).coverPath;if(path){try{const url=await JourneyAPI.asset(path);if(img.isConnected)img.src=url;}catch(_){}}}}
@@ -34,7 +34,7 @@
     const b = L.books.find(b => b.id === id); if (!b) return;
     if (!ready) { message('Sign in to save reading notes and upload your books.',true); JourneyAPI.login('library'); return; }
     try { await reload(); } catch (_) { message('Reading records could not be loaded. Existing data has been kept.',true); return; }
-    selected = id; original = {...value(id)}; $('pdf-file').value='';$('cover-file').value='';$('file-status').textContent=original.pdfPath?'PDF uploaded · open it using Read PDF.':'Upload a PDF you own or have permission to use (up to 50 MB).';
+    selected = id; original = {...value(id)}; $('pdf-file').value='';$('cover-file').value='';$('file-status').textContent=original.pdfPath?'PDF uploaded'+(original.pdfPages?' · '+original.pdfPages+' pages':'')+' · open it using Read PDF.':'Upload a PDF you own or have permission to use (up to 50 MB).';
     $('book-title').textContent = b.title; $('book-author').textContent = b.author; $('book-prompt').textContent = b.prompt;
     for (const field of L.fields) $('book-form').elements.namedItem(field).value = original[field];
     draft = JSON.stringify(formValue()); $('book-error').textContent = ''; $('book-dialog').showModal();
@@ -65,6 +65,7 @@
   $('add-book').onclick=()=>{if(!ready){JourneyAPI.login('library');return;}$('new-book-dialog').showModal();};
   $('new-book-form').onsubmit=async e=>{e.preventDefault();const f=e.target;try{const id='custom-'+crypto.randomUUID();await JourneyAPI.save('book:'+id,'book',{...L.blank(),title:f.elements.title.value.trim(),author:f.elements.author.value.trim()});await reload();render();$('new-book-dialog').close();f.reset();open(id);}catch(err){$('new-book-error').textContent=err.message;}};
   window.addEventListener('beforeunload',e => { if ($('book-dialog').open && dirty()) { e.preventDefault(); e.returnValue = ''; } });
+  window.JourneyLibraryUI={reload:async()=>{await reload();render();},message};
   JourneyAPI.ready.then(async u=>{user=u;if(!u){message('Browse the reading path. Sign in to save notes, add books, or read your private PDFs.');return;}await reload();ready=true;render();message('Connected · reading records save directly to your account.');}).catch(err=>message('Account unavailable: '+err.message,true));
   render();
 })();

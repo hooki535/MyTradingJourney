@@ -21,7 +21,7 @@
  }
  function analytics(sessions){
   const trades=sessions.flatMap(s=>s.trades.map(t=>({...t,symbol:t.symbol||s.symbol,sessionId:s.id,sessionName:s.name,startBalance:s.startBalance}))).sort((a,b)=>a.exitTime-b.exitTime||a.entryTime-b.entryTime);
-  const wins=trades.filter(t=>t.pnl>0),losses=trades.filter(t=>t.pnl<0),breakeven=trades.filter(t=>t.pnl===0),daily=new Map(),monthly=new Map(),weekly=new Map();
+  const engine=typeof module==='object'&&module.exports?require('./backtest-engine.js'):window.BacktestEngine,completed=sessions.flatMap(s=>engine.completedTrades(s).map(t=>({...t,symbol:t.symbol||s.symbol,sessionId:s.id,sessionName:s.name,startBalance:s.startBalance}))),wins=completed.filter(t=>t.pnl>0),losses=completed.filter(t=>t.pnl<0),breakeven=completed.filter(t=>t.pnl===0),daily=new Map(),monthly=new Map(),weekly=new Map();
   const weekdays=Array.from({length:7},(_,i)=>({name:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][i],trades:[],pnl:0}));
   const buckets=[{name:'Asia',hours:'00:00–07:00 UTC',trades:[]},{name:'London',hours:'07:00–13:00 UTC',trades:[]},{name:'New York',hours:'13:00–21:00 UTC',trades:[]},{name:'Outside sessions',hours:'21:00–00:00 UTC',trades:[]}],pairs=new Map();
   let winStreak=0,lossStreak=0,maxWins=0,maxLosses=0,cumulative=0;
@@ -32,17 +32,19 @@
    weekdays[dt.getUTCDay()].trades.push(t);weekdays[dt.getUTCDay()].pnl+=t.pnl;
    const hour=new Date(t.entryTime*1000).getUTCHours();buckets[hour<7?0:hour<13?1:hour<21?2:3].trades.push(t);
    if(!pairs.has(t.symbol))pairs.set(t.symbol,[]);pairs.get(t.symbol).push(t);
-   winStreak=t.pnl>0?winStreak+1:0;lossStreak=t.pnl<0?lossStreak+1:0;maxWins=Math.max(maxWins,winStreak);maxLosses=Math.max(maxLosses,lossStreak);
+
   }
+  for(const t of [...completed].sort((a,b)=>a.exitTime-b.exitTime)){winStreak=t.pnl>0?winStreak+1:0;lossStreak=t.pnl<0?lossStreak+1:0;maxWins=Math.max(maxWins,winStreak);maxLosses=Math.max(maxLosses,lossStreak);}
   const days=[...daily].sort(([a],[b])=>a.localeCompare(b)).map(([date,rows])=>{cumulative+=sum(rows);return {date,pnl:sum(rows),trades:rows,cumulative};});
   const periods=map=>[...map].map(([date,rows])=>({date,pnl:sum(rows),trades:rows}));
   const extremes=rows=>rows.length?{best:rows.reduce((a,b)=>a.pnl>=b.pnl?a:b),worst:rows.reduce((a,b)=>a.pnl<=b.pnl?a:b)}:{best:null,worst:null};
   const months=periods(monthly),weeks=periods(weekly);
   let dayWin=0,dayLoss=0,maxDayWins=0,maxDayLosses=0;for(const d of days){dayWin=d.pnl>0?dayWin+1:0;dayLoss=d.pnl<0?dayLoss+1:0;maxDayWins=Math.max(maxDayWins,dayWin);maxDayLosses=Math.max(maxDayLosses,dayLoss);}
   const grossWin=sum(wins),grossLoss=-sum(losses);
-  return {trades,wins,losses,breakeven,days,months,weeks,weekdays,buckets,pairs:[...pairs].map(([symbol,trades])=>({symbol,trades,pnl:sum(trades)})),net:sum(trades),fees:trades.reduce((n,t)=>n+t.fees,0),grossWin,grossLoss,profitFactor:grossLoss?grossWin/grossLoss:grossWin?Infinity:null,winRate:trades.length?wins.length/trades.length*100:null,expectancy:average(trades),avgWin:average(wins),avgLoss:average(losses),avgDay:days.length?sum(trades)/days.length:null,maxWins,maxLosses,maxDayWins,maxDayLosses,profitableDays:days.filter(d=>d.pnl>0).length,dayExtremes:extremes(days),monthExtremes:extremes(months),weekExtremes:extremes(weeks),largestWin:wins.length?wins.reduce((n,t)=>Math.max(n,t.pnl),-Infinity):null,largestLoss:losses.length?losses.reduce((n,t)=>Math.min(n,t.pnl),Infinity):null,averageDuration:trades.length?trades.reduce((n,t)=>n+t.exitTime-t.entryTime,0)/trades.length:null};
+  return {trades:completed,executions:trades,positionCount:completed.length,wins,losses,breakeven,days,months,weeks,weekdays,buckets,pairs:[...pairs].map(([symbol,trades])=>({symbol,trades,pnl:sum(trades)})),net:sum(trades),fees:trades.reduce((n,t)=>n+t.fees,0),grossWin,grossLoss,profitFactor:grossLoss?grossWin/grossLoss:grossWin?Infinity:null,winRate:completed.length?wins.length/completed.length*100:null,expectancy:average(completed),avgWin:average(wins),avgLoss:average(losses),avgDay:days.length?sum(trades)/days.length:null,maxWins,maxLosses,maxDayWins,maxDayLosses,profitableDays:days.filter(d=>d.pnl>0).length,dayExtremes:extremes(days),monthExtremes:extremes(months),weekExtremes:extremes(weeks),largestWin:wins.length?wins.reduce((n,t)=>Math.max(n,t.pnl),-Infinity):null,largestLoss:losses.length?losses.reduce((n,t)=>Math.min(n,t.pnl),Infinity):null,averageDuration:trades.length?trades.reduce((n,t)=>n+t.exitTime-t.entryTime,0)/trades.length:null};
  }
  function scopeSessions(sessions,scope='all'){if(scope==='all')return sessions.slice();if(scope.startsWith('strategy:')){const id=scope.slice(9);return id?sessions.filter(s=>s.strategyId===id):[];}return sessions.filter(s=>s.id===scope);}
- function strategyMetrics(sessions,id){const selected=scopeSessions(sessions,'strategy:'+id),a=analytics(selected);return {sessions:selected.length,trades:a.trades.length,winRate:a.winRate,net:a.net,replayedSeconds:selected.reduce((n,s)=>n+Math.max(0,s.kind==='portfolio'?s.clock-s.initialTime:s.candles[s.cursor].t-s.candles[s.initialCursor].t),0)};}
+ function strategyMetrics(sessions,id){const selected=scopeSessions(sessions,'strategy:'+id),a=analytics(selected);return {sessions:selected.length,trades:a.positionCount,winRate:a.winRate,net:a.net,replayedSeconds:selected.reduce((n,s)=>n+Math.max(0,s.kind==='portfolio'?s.clock-s.initialTime:s.candles[s.cursor].t-s.candles[s.initialCursor].t),0)};}
  return {study,riskSize,analytics,scopeSessions,strategyMetrics};
 });
+

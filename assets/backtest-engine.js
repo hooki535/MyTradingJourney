@@ -10,7 +10,7 @@
   const finite = n => typeof n === 'number' && Number.isFinite(n);
   const id = () => 'bt-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
   const strategyCopy = s => s && typeof s === 'object' ? {...Object.fromEntries(['name','description','setup','entry','exit','risk'].map(k=>[k,String(s[k] || '').slice(0,2000)])),color:/^#[0-9a-f]{6}$/i.test(s.color)?s.color:'#4385ff',checklist:Array.isArray(s.checklist)?s.checklist.map(x=>String(x).slice(0,200)).filter(Boolean).slice(0,20):[]} : null;
-  const tradeKey=t=>[t.symbol || '',t.entryTime,t.exitTime,t.side].join(':');
+  const tradeKey=t=>[t.symbol || '',t.entryTime,t.exitTime,t.side,...(t.partialSeries?[t.exitLeg]:[])].join(':');
   function cleanFibLevels(raw){const values=Array.isArray(raw)?raw:typeof raw==='string'?raw.split(',').map(x=>x.trim()):[];if(values.length<2||values.length>20||values.some(x=>x===''||!Number.isFinite(Number(x))||Math.abs(Number(x))>10))throw Error('Use 2–20 comma-separated levels between -10 and 10.');const levels=[...new Set(values.map(Number))].sort((a,b)=>a-b);if(levels.length<2)throw Error('Use at least two distinct levels.');return levels;}
   function savedFibLevels(raw){try{return cleanFibLevels(raw);}catch(_){return [0,.236,.382,.5,.618,.786,1];}}
   function cleanAnnotations(rows){return Array.isArray(rows)?rows.filter(a=>Suite.validate(a)).slice(0,200).map(a=>({id:/^[\w-]{1,100}$/.test(a.id)?a.id:id(),type:a.type,...(a.settings&&typeof a.settings==='object'?{settings:Settings.saved(a.type,a.settings)}:{}),...(Array.isArray(a.visibility)?{visibility:a.visibility.filter(x=>Settings.frames.includes(x)).slice(0,16)}:{}),...(a.type==='fib'?{levels:savedFibLevels(a.levels),extendLeft:!!a.extendLeft,extendRight:!!a.extendRight,showPrices:a.showPrices!==false}:{}),points:a.points.map(p=>({i:p.i,p:p.p})),color:/^#[0-9a-f]{6}$/i.test(a.color)?a.color:'#f8c344',width:[1,2,3,4].includes(a.width)?a.width:2,dash:['solid','dashed','dotted'].includes(a.dash)?a.dash:'solid',...(finite(a.offset)?{offset:a.offset}:{}),...(a.anchor&&[a.anchor.x,a.anchor.y].every(n=>finite(n)&&n>=0&&n<=1)?{anchor:{x:a.anchor.x,y:a.anchor.y}}:{}),hidden:!!a.hidden,locked:!!a.locked,text:String(a.text||'Note').slice(0,200),...(finite(a.target)&&a.target>0?{target:a.target}:{})})):[];}
@@ -109,16 +109,23 @@
     const p = s.position, sign = p.side === 'long' ? 1 : -1;
     return sign * (s.candles[s.cursor].c-p.entry)*p.quantity*cashMultiplier(s);
   }
-  function closePosition(s, price, time, reason) {
-    const p = s.position; if (!p) return;
-    const sign = p.side === 'long' ? 1 : -1;
-    const exit = Math.max(Number.EPSILON, price-(reason === 'Target' ? 0 : sign*s.slippage));
-    const gross = sign*(exit-p.entry)*p.quantity*cashMultiplier(s,exit);
-    const exitFee = s.fee*p.quantity;
-    const pnl = gross - 2*exitFee;
-    s.balance += gross - exitFee; // Entry fee was deducted at fill.
-    s.trades.push({...p, exit, exitTime:time, reason, gross, fees:2*exitFee, pnl, r:p.riskCash > 0 ? pnl/p.riskCash : null});
-    s.position = null;
+  function closePosition(s, price, time, reason, quantity) {
+    const p=s.position;if(!p)return;
+    const qty=quantity===undefined?p.quantity:quantity;
+    if(!finite(qty)||qty<=0||qty>p.quantity)throw Error('Invalid close quantity.');
+    const sign=p.side==='long'?1:-1,exit=Math.max(Number.EPSILON,price-(reason==='Target'?0:sign*s.slippage));
+    const gross=sign*(exit-p.entry)*qty*cashMultiplier(s,exit),exitFee=s.fee*qty,pnl=gross-2*exitFee;
+    const remaining=Math.max(0,p.quantity-qty),allocatedRisk=p.riskCash*qty/p.quantity,initialRisk=p.initialRiskCash||p.riskCash;
+    s.balance+=gross-exitFee;
+    s.trades.push({...p,quantity:qty,riskCash:allocatedRisk,exit,exitTime:time,reason,gross,fees:2*exitFee,pnl,r:initialRisk>0?pnl/initialRisk:null,...(p.partialSeries?{exitLeg:(p.exitLegCount||0),remainingQuantity:remaining}:{} )});
+    if(remaining>0){p.quantity=remaining;p.riskCash-=allocatedRisk;p.exitLegCount=(p.exitLegCount||0)+1;p.closeRequested=false;delete p.closeQuantity;}
+    else s.position=null;
+  }
+  function completedTrades(s) {
+    const result=[],groups=new Map();
+    for(const t of s.trades){if(!t.partialSeries){result.push(t);continue;}const k=[t.symbol||s.symbol,t.entryTime,t.side].join(':');if(!groups.has(k))groups.set(k,[]);groups.get(k).push(t);}
+    for(const legs of groups.values()){const last=legs.at(-1);if(last.remainingQuantity>0)continue;const sum=k=>legs.reduce((n,t)=>n+t[k],0),risk=last.initialRiskCash;result.push({...last,quantity:last.initialQuantity,exitTime:last.exitTime,pnl:sum('pnl'),gross:sum('gross'),fees:sum('fees'),riskCash:risk,r:risk>0?sum('pnl')/risk:null,legs:legs.length});}
+    return result.sort((a,b)=>a.exitTime-b.exitTime);
   }
   function processBracket(s, bar, allowTarget) {
     const p = s.position; if (!p) return;
@@ -137,7 +144,7 @@
     if (s.position) {
       if (s.position.closeRequested) {
         processBracket(s,{...bar,h:bar.o,l:bar.o},true);
-        if (s.position) closePosition(s,bar.o,bar.t,'Manual close');
+        if(s.position){const quantity=s.position.closeQuantity;closePosition(s,bar.o,bar.t,quantity!==undefined?'Partial close':'Manual close',quantity);if(s.position)processBracket(s,bar,true);}
       }
       else processBracket(s,bar,true);
     }
@@ -177,8 +184,18 @@
   function requestClose(s) {
     if (!s.position) throw Error('There is no open position.');
     if (s.cursor === s.candles.length-1) throw Error('No next candle remains. Export the open position or start another session.');
+    if(s.position.closeRequested)throw Error('A close is already queued. Advance one candle first.');
     s.position.closeRequested=true; s.notice='Close queued for the next candle open.';
     s.actions.push({cursor:s.cursor, kind:'close'});
+  }
+  function requestPartialClose(s,quantity) {
+    const qty=Number(quantity),p=s.position;
+    if(!p)throw Error('There is no open position.');
+    if(!finite(qty)||qty<=0||qty>=p.quantity)throw Error('Partial quantity must be greater than zero and smaller than the open quantity.');
+    if(p.closeRequested)throw Error('A close is already queued. Advance one candle first.');
+    if(s.cursor>=s.candles.length-1)throw Error('No next candle remains.');
+    p.initialQuantity??=p.quantity;p.initialRiskCash??=p.riskCash;p.partialSeries=true;p.closeQuantity=qty;p.closeRequested=true;
+    s.actions.push({cursor:s.cursor,kind:'partial-close',quantity:qty});s.notice='Partial close queued for the next candle open. Stop and target remain on the rest.';
   }
   function cancelOrder(s) {
     if (!s.pending) throw Error('There is no pending order.');
@@ -198,6 +215,7 @@
       while (s.cursor < action.cursor) step(s);
       if (action.kind === 'order') placeOrder(s,action.order);
       else if (action.kind === 'close') requestClose(s);
+      else if(action.kind==='partial-close')requestPartialClose(s,action.quantity);
       else if (action.kind === 'cancel') cancelOrder(s);
       else throw Error('Unknown saved action.');
     }
@@ -214,13 +232,14 @@
     return s;
   }
   function metrics(s) {
-    const wins=s.trades.filter(t=>t.pnl>0), losses=s.trades.filter(t=>t.pnl<0);
+    const completed=completedTrades(s),wins=completed.filter(t=>t.pnl>0),losses=completed.filter(t=>t.pnl<0);
     const grossWin=wins.reduce((n,t)=>n+t.pnl,0), grossLoss=-losses.reduce((n,t)=>n+t.pnl,0);
     let peak=s.startBalance, drawdown=0;
     for (const e of s.equity) { peak=Math.max(peak,e.value); drawdown=Math.max(drawdown,peak>0 ? (peak-e.value)/peak*100 : 0); }
     const realized=s.trades.reduce((n,t)=>n+t.pnl,0);
     const equity=s.balance+unrealized(s);
-    return {trades:s.trades.length,wins:wins.length,losses:losses.length,breakeven:s.trades.length-wins.length-losses.length,winRate:s.trades.length ? wins.length/s.trades.length*100 : null,profitFactor:grossLoss>0 ? grossWin/grossLoss : grossWin>0 ? Infinity : null,drawdown,realized,unrealized:unrealized(s),equity,returnPct:(equity/s.startBalance-1)*100,expectancy:s.trades.length ? realized/s.trades.length : null};
+    return {trades:completed.length,executions:s.trades.length,wins:wins.length,losses:losses.length,breakeven:completed.length-wins.length-losses.length,winRate:completed.length ? wins.length/completed.length*100 : null,profitFactor:grossLoss>0 ? grossWin/grossLoss : grossWin>0 ? Infinity : null,drawdown,realized,unrealized:unrealized(s),equity,returnPct:(equity/s.startBalance-1)*100,expectancy:completed.length ? completed.reduce((n,t)=>n+t.pnl,0)/completed.length : null};
   }
-  return {research:Research,id,tradeKey,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,cancelOrder,snapshot,restore,unrealized,metrics};
+  return {research:Research,id,tradeKey,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,requestPartialClose,completedTrades,cancelOrder,snapshot,restore,unrealized,metrics};
 });
+

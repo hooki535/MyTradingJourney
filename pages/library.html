@@ -6,10 +6,10 @@
   <meta name="description" content="Your personal 21-book reading path, reflections, and practical learning actions.">
   <link rel="stylesheet" href="../assets/shell.css">
   <link rel="stylesheet" href="../assets/library.css?v=1">
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script><script defer src="../assets/journey-api.js?v=2"></script><script defer src="../assets/journey-shell.js?v=2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script><script defer src="../assets/journey-api.js?v=2"></script><script defer src="../assets/journey-icons.js?v=3"></script><script defer src="../assets/journey-theme.js?v=3"></script><script defer src="../assets/journey-shell.js?v=2"></script>
   <script defer src="../assets/library-data.js?v=1"></script>
   <script defer src="../assets/library.js?v=2"></script>
-<link rel="stylesheet" href="../assets/journey.css?v=2"></head>
+<link rel="stylesheet" href="../assets/journey.css?v=2"><link rel="stylesheet" href="../assets/journey-theme.css?v=3"><script defer src="../assets/library-import.js?v=3"></script></head>
 <body data-page="library" data-depth="1" data-shell="none">
   <a class="skip" href="#main">Skip to library</a>
   <div class="learn-layout">
@@ -21,13 +21,13 @@
     </aside>
     <main id="main" class="learn-main">
       <div class="learn-top"><span>Personal development <span aria-hidden="true">/</span> <b>Learning Library</b></span><a href="backtesting.html#sessions">Open replay ↗</a></div>
-      <header class="learn-heading"><div><p class="eyebrow">YOUR NEXT CHAPTER</p><h1>Learning Library</h1><p>Build knowledge. Put it into practice. Keep the evidence.</p></div><div class="learn-actions"><button id="add-book" class="learn-button primary">+ Add book</button><button id="import-browser" class="learn-button">Import older browser notes</button><button id="export-library" class="learn-button">Export reading backup</button><label class="learn-button">Import backup<input id="import-library" type="file" accept="application/json,.json" hidden></label></div></header>
+      <header class="learn-heading"><div><p class="eyebrow">YOUR NEXT CHAPTER</p><h1>Learning Library</h1><p>Build knowledge. Put it into practice. Keep the evidence.</p></div><div class="learn-actions"><label class="learn-button primary">Import book PDFs<input id="bulk-book-files" type="file" accept="application/pdf" multiple hidden></label><button id="add-book" class="learn-button primary">+ Add book</button><button id="import-browser" class="learn-button">Import older browser notes</button><button id="export-library" class="learn-button">Export reading backup</button><label class="learn-button">Import backup<input id="import-library" type="file" accept="application/json,.json" hidden></label></div></header>
       <p class="storage-note">Reading notes, covers and PDFs save privately to your signed-in account. Files are available on your other devices.</p>
       <div id="library-message" role="status" aria-live="polite"></div>
       <noscript><p>Enable JavaScript to view the reading path and save your notes.</p></noscript>
       <section id="reading-stats" class="reading-stats" aria-label="Reading overview"></section>
       <section id="reading-focus" class="reading-focus" aria-label="Next learning action"></section>
-      <div class="library-toolbar"><div><h2>Your reading path</h2><p>21 books · 5 areas of growth</p></div><div class="library-filters"><label><span>Search books</span><input id="book-search" type="search" placeholder="Title or author"></label><label><span>Category</span><select id="book-category"><option value="all">All categories</option></select></label><label><span>Status</span><select id="book-status"><option value="all">All statuses</option><option value="planned">To read</option><option value="reading">Reading</option><option value="paused">Paused</option><option value="completed">Finished</option></select></label></div></div>
+      <div class="library-toolbar"><div><h2>Your reading path</h2><p>22 books · 5 areas of growth</p></div><div class="library-filters"><label><span>Search books</span><input id="book-search" type="search" placeholder="Title or author"></label><label><span>Category</span><select id="book-category"><option value="all">All categories</option></select></label><label><span>Status</span><select id="book-status"><option value="all">All statuses</option><option value="planned">To read</option><option value="reading">Reading</option><option value="paused">Paused</option><option value="completed">Finished</option></select></label></div></div>
       <p id="result-count" class="result-count" aria-live="polite"></p>
       <div id="book-grid" class="book-grid"></div>
       <footer class="learn-footer">The order follows your personal reading path. Actions are original prompts for reflection; examine each idea against your own evidence.</footer>

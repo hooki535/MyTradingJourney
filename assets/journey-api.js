@@ -8,7 +8,7 @@
   const ready = client.auth.getUser().then(({data,error}) => { user = data?.user || null; if (error && error.name !== 'AuthSessionMissingError') throw error; return user; });
   function setReturn(page,hash='') { if (!['journey','library','reader','backtesting'].includes(page)) return; try { sessionStorage.setItem('op-return',JSON.stringify({page,hash:/^#[A-Za-z0-9/_-]*$/.test(hash)?hash:'',at:Date.now()})); } catch (_) {} }
   async function account() { const u=await ready; if (!u) throw Error('Sign in to save and open your private records.'); return u; }
-  async function list(kind) { const u=await account(); let q=client.from('journey_records').select('*').eq('user_id',u.id).order('updated_at',{ascending:false}); if(kind)q=q.eq('kind',kind); const {data,error}=await q; if(error)throw error;return data; }
+  async function list(kind) { const u=await account(); let q=client.from('journey_records').select('*').eq('user_id',u.id).order('updated_at',{ascending:false}); if(kind)q=q.eq('kind',kind); const {data,error}=await q; if(error)throw error;return data.filter(r=>!r.id.startsWith('settings:')); }
   async function save(id,kind,payload,revision=null) {
     const u=await account(); const row={user_id:u.id,id,kind,payload,revision:revision===null?1:revision+1,updated_at:new Date().toISOString()};
     const q=revision===null?client.from('journey_records').insert(row):client.from('journey_records').update(row).eq('user_id',u.id).eq('id',id).eq('revision',revision);

@@ -27,7 +27,8 @@
     ['zero-to-one','Zero to One','Peter Thiel',4,'Describe a specific problem your product could solve in a distinct way.'],
     ['lean-startup','The Lean Startup','Eric Ries',4,'Test one small product assumption with an observable outcome.'],
     ['shoe-dog','Shoe Dog','Phil Knight',4,'Write down a business uncertainty and one action that could reduce it.'],
-    ['millionaire-fastlane','The Millionaire Fastlane','MJ DeMarco',4,'Evaluate a business idea by the customer problem and evidence of demand.']
+    ['millionaire-fastlane','The Millionaire Fastlane','MJ DeMarco',4,'Evaluate a business idea by the customer problem and evidence of demand.'],
+    ['ten-times-rule','The 10X Rule','Grant Cardone',0,'Choose a concrete goal, test your assumptions, and plan sustainable actions.']
   ];
   const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1}));
   const key = 'mytradingjourney:library:v1';
@@ -75,5 +76,6 @@
     storage.setItem(key,JSON.stringify(state));
     return state;
   }
-  return {books,groups,key,fields,statuses,blank,record,validate,empty,read,save,restore};
+  const freeSources={almanack:{title:"Official free PDF",url:"https://navalmanack.s3.amazonaws.com/Eric-Jorgenson_The-Almanack-of-Naval-Ravikant_Final.pdf",source:"https://www.navalmanack.com/home"},reminiscences:{title:"Read free at Project Gutenberg",url:"https://www.gutenberg.org/cache/epub/60979/pg60979-images.html",source:"https://www.gutenberg.org/ebooks/60979"}};
+  return {books,freeSources,groups,key,fields,statuses,blank,record,validate,empty,read,save,restore};
 });
