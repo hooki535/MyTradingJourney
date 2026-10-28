@@ -9,7 +9,7 @@
   const {E}=ctx,storage=window.JourneyWorkspaceStorage;
   for(const [selector,id,text] of [['#bt-open-journal','journal','Journal'],['#bt-objects','layers',''],['#bt-shortcuts','help',''],['#bt-hide-balances','hide',''],['#bt-settings','settings',''],['#bt-fullscreen','fullscreen',''],['#bt-camera','camera',''],['#bt-save-session','save','Save'],['#bt-indicators','indicators','Indicators'],['#bt-toggle-order','order','Order'],['#bt-go','go','Go to'],['#bt-rules','rules','Rules'],['.bt-session-heading [data-stats]','stats','Stats'],['.bt-session-heading [data-research]','brief','Brief'],['#bt-hide-order','close','']]){const b=$(selector);if(b)b.innerHTML=I.label(id,text);}
   for(const a of document.querySelectorAll('.journey-sidebar nav a')){const label=a.textContent.trim();if(label){a.setAttribute('aria-label',label);a.title=label;}}
-  let prefs=R.preferences(),companion=null,job=null,scheduled=null,disposed=false,notesTimer=null,floating=false;
+  let prefs=R.preferences(),companion=null,job=null,scheduled=null,disposed=false,notesTimer=null,floating=true;
   try{prefs=R.preferences(JSON.parse(storage.getItem(key)||'{}'));}catch(_){}
   function savePrefs(){storage.setItem(key,JSON.stringify(prefs));}
   const bar=$('.bt-replay-controls'),box=$('.bt-canvas-box'),stage=$('.bt-chart-stage'),terminal=$('#bt-terminal'),form=$('#bt-order-form');
@@ -17,9 +17,10 @@
   bar.classList.add('bt-pro-replay');bar.setAttribute('role','toolbar');bar.setAttribute('aria-label','Market replay controls');
   const savedHeight=Number.parseFloat(document.body.style.getPropertyValue('--bt-chart-height'));document.body.dataset.manualReplayHeight=String(Number.isFinite(savedHeight)&&savedHeight!==560);const resizer=$('#bt-chart-resizer');resizer?.addEventListener('pointerdown',()=>document.body.dataset.manualReplayHeight='true');resizer?.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','Home','End'].includes(e.key))document.body.dataset.manualReplayHeight='true';});
   const stepControls=document.createElement('div');stepControls.className='bt-step-controls';stepControls.innerHTML='<label title="Match the chart timeframe"><input id="bt-step-sync" type="checkbox"> Sync</label><select id="bt-replay-step" class="bt-select" aria-label="Replay timestep"></select><label title="Pause as soon as any trade exits"><input id="bt-pause-exit" type="checkbox"> Pause on exit</label>';
-  bar.append(stepControls);bar.append($('#bt-go'));
-  const dockButton=document.createElement('button');dockButton.id='bt-replay-float';dockButton.className='bt-button small';dockButton.innerHTML=I.label('float','Float');dockButton.title='Float replay controls on the chart';bar.append(dockButton);
-  dockButton.onclick=()=>{floating=!floating;bar.classList.toggle('is-floating',floating);if(floating){box.append(bar);bar.style.left='12px';bar.style.top=Math.max(40,box.clientHeight-90)+'px';}else{slot.append(bar);bar.style.removeProperty('left');bar.style.removeProperty('top');}dockButton.innerHTML=I.label(floating?'dock':'float',floating?'Dock':'Float');};
+  const replayOptions=document.createElement('details');replayOptions.className='bt-replay-options';replayOptions.innerHTML='<summary aria-label="Replay options" title="Replay options">'+I.svg('settings')+'</summary>';replayOptions.append(stepControls);bar.append(replayOptions);
+  const dockButton=document.createElement('button');dockButton.id='bt-replay-float';dockButton.className='bt-button small';dockButton.innerHTML=I.svg('dock');dockButton.title='Dock replay controls below the chart';dockButton.setAttribute('aria-label','Dock replay controls');bar.append(dockButton);
+  dockButton.onclick=()=>{floating=!floating;bar.classList.toggle('is-floating',floating);if(floating){box.append(bar);bar.style.left='12px';bar.style.top=Math.max(40,box.clientHeight-90)+'px';}else{slot.append(bar);bar.style.removeProperty('left');bar.style.removeProperty('top');}dockButton.innerHTML=I.svg(floating?'dock':'float');dockButton.title=floating?'Dock replay controls below the chart':'Float replay controls on the chart';dockButton.setAttribute('aria-label',floating?'Dock replay controls':'Float replay controls');replayOptions.open=false;};
+  bar.classList.add('is-floating');box.append(bar);bar.style.left='55px';bar.style.top='45px';
   const runStatus=document.createElement('div');runStatus.className='bt-run-status';runStatus.innerHTML='<span id="bt-replay-state">Paused · forward replay</span><span id="bt-pro-session-window"></span><button id="bt-stop-skip" class="bt-text-button" hidden>Stop skip</button>';slot.append(runStatus);
   $('#bt-stop-skip').onclick=()=>ctx.pause();
   $('#bt-step-sync').checked=prefs.syncFrame;$('#bt-pause-exit').checked=prefs.pauseOnExit;
@@ -81,9 +82,9 @@
    $('#bt-pro-market-list').innerHTML=(s.markets||[s]).map(m=>'<button type="button" class="bt-pro-market '+(m.symbol===s.symbol?'active':'')+'" data-pro-market="'+esc(m.symbol)+'"><b>'+esc(m.symbol)+'</b><span>'+Number(m.candles[m.cursor].c.toPrecision(8))+'</span><small>'+m.interval+' · '+(m.position?'Position open':m.pending?'Order pending':'No position')+'</small></button>').join('');
    $('#bt-pro-market-list').onclick=e=>{const button=e.target.closest('[data-pro-market]');if(!button)return;if(s.markets)document.querySelector('[data-market="'+button.dataset.proMarket+'"]')?.click();else panel('order');};
   }
-  function keyboard(e){if(e.key==='Escape'&&!$('#bt-dialog').open&&document.body.classList.contains('bt-focus-mode')){focus.click();return;}if(!e.altKey||!e.ctrlKey||e.metaKey||e.key.toLowerCase()!=='g'||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||$('#bt-dialog').open)return;e.preventDefault();goMenu();}
-  document.addEventListener('keydown',keyboard);refresh();
-  return {advance,cancel,panel,busy:()=>!!job,refresh,destroy(){disposed=true;cancel();clearTimeout(notesTimer);if(notesTimer)ctx.persist();companion?.destroy();document.removeEventListener('keydown',keyboard);document.body.classList.remove('bt-focus-mode');}};
+  function keyboard(e){if(e.key==='Escape'&&replayOptions.open){replayOptions.open=false;return;}if(e.key==='Escape'&&!$('#bt-dialog').open&&document.body.classList.contains('bt-focus-mode')){focus.click();return;}if(!e.altKey||!e.ctrlKey||e.metaKey||e.key.toLowerCase()!=='g'||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||$('#bt-dialog').open)return;e.preventDefault();goMenu();}
+  function dismissOptions(e){if(!replayOptions.contains(e.target))replayOptions.open=false;}document.addEventListener('pointerdown',dismissOptions);document.addEventListener('keydown',keyboard);refresh();
+  return {advance,cancel,panel,busy:()=>!!job,refresh,destroy(){disposed=true;cancel();clearTimeout(notesTimer);if(notesTimer)ctx.persist();companion?.destroy();document.removeEventListener('keydown',keyboard);document.removeEventListener('pointerdown',dismissOptions);document.body.classList.remove('bt-focus-mode');}};
  }
  window.BacktestReplayUI={mount};
 })();

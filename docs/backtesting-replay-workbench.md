@@ -1,21 +1,21 @@
 # Replay workbench upgrade
 
-The existing simulation engine, action history, session IDs, strategy snapshots, storage keys and owner-scoped account synchronization are retained. This is an original implementation informed by FX Replay's public guides, not an integration with its service or market-data licenses.
+The presentation now uses the restored charcoal-and-gold Goat-style layout (`backtesting-goat.css`), replacing the FX Replay presentation stylesheet. The existing simulation engine, action history, session IDs, strategy snapshots, storage keys and owner-scoped account synchronization are retained. This is an original implementation informed by FX Replay's public guides, not an integration with its service or market-data licenses.
 
 ## Existing capabilities retained
 
 Archived OHLC/CSV and configured history sources, market/limit/stop orders, next-open execution, configured costs, stop-first ambiguous-bar resolution, partial exits, multi-market shared equity/clock, drawing tools and templates, account challenges, frozen strategy rules, research briefs, execution reviews, analytics, CSV exports and workspace backups remain in place.
 
-## New workflow
+## Replay features
 
-- The replay bar sits below the chart by default. Float moves the existing bar onto the primary chart; its original drag/keyboard grip still works. Dock returns it below the chart.
+- The restored Goat-style layout floats a compact replay bar over the chart by default. Its drag/keyboard grip remains available. Replay options hold Sync, timestep and Pause on exit. Dock optionally moves the bar below the chart; Float brings it back.
 - Sync uses the primary chart timeframe. Disable Sync to select an independent source or aggregated interval. A timeframe step advances to the next boundary, processing all intervening source bars. The last candle can remain partially built. Seconds data is not fabricated from minute or hourly data.
 - Go to advances to the next London 08:00, New York 08:00 or Tokyo 09:00 local opening, the next UTC day, a UTC date, a price touch or the active instrument's position close. Weekends and local daylight-saving offsets are handled for opening shortcuts. These are explicit research windows, not broker hours or trade recommendations.
 - Time jumps stop on the first available source timestamp at or after the target, within loaded history. Price searches process each candle before checking its range; they stop on a touching OHLC bar or at the selected search window. The maximum window cannot skip an out-of-window source bar. A missed level leaves the replay at the processed time. Position-close mode continues through partial exits until the active position is flat.
 - Pause on exit stops any replay step or time/price jump on an execution, including a partial close. Position-close mode deliberately continues through partial exits. Challenge completion/failure always stops a run. Batches yield every 200 engine steps; Stop skip and ordinary pause preserve processed trades and bars. Navigation and owner changes dispose of replay jobs.
 - Two charts adds a second timeframe view of the active symbol. Both derive from the same revealed source prefix and shared replay clock. Context-pane drawings are cloned/locked. Pan, zoom and crosshair remain independent. It does not imply a tick feed or independently advancing charts.
 - The ticket has Order, Journal and Markets panels. Journal reuses `session.notes` and existing trade-review records. Markets lists the existing portfolio pairs and last revealed closes. Relative order presets store risk percentage, stop distance and target R; applying one only prepares a market ticket and reuses the existing risk-size calculation. The user still submits the order.
-- Focus provides a larger chart surface; Escape leaves focus. The existing light/dark theme, fullscreen, drawing tools, chart resizing and attribution remain available. Standard viewport fitting yields to manually resized or previously customized chart heights.
+- Focus provides a larger chart surface; Escape leaves focus. The existing light/dark theme, fullscreen, drawing tools, chart resizing and attribution remain available. The chart keeps the original resizable height and saved custom heights.
 
 ## Persistence
 
