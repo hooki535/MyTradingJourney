@@ -1,0 +1,2 @@
+# Historical archive manifests verify exact bytes on every platform.
+assets/backtesting/data/*.csv text eol=lf
