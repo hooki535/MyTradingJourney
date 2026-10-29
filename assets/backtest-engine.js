@@ -197,6 +197,18 @@
     p.initialQuantity??=p.quantity;p.initialRiskCash??=p.riskCash;p.partialSeries=true;p.closeQuantity=qty;p.closeRequested=true;
     s.actions.push({cursor:s.cursor,kind:'partial-close',quantity:qty});s.notice='Partial close queued for the next candle open. Stop and target remain on the rest.';
   }
+  function amendOrder(s, changes) {
+    const p=s.position||s.pending;if(!p)throw Error('There is no position or pending order to edit.');
+    if(p.closeRequested)throw Error('A close is already queued. Advance one candle first.');
+    if(s.cursor>=s.candles.length-1)throw Error('No next candle remains.');
+    const stop=Number(changes.stop),target=Number(changes.target),entry=s.position?p.entry:p.type==='market'?null:Number(changes.entry);
+    const reference=s.position?s.candles[s.cursor].c:entry||s.candles[s.cursor].c;
+    if(!finite(stop)||stop<=0||!finite(target)||target<=0||(!s.position&&p.type!=='market'&&(!finite(entry)||entry<=0)))throw Error('Enter valid positive prices.');
+    if(p.side==='long'?!(stop<reference&&reference<target):!(target<reference&&reference<stop))throw Error(s.position?'Stop and target must bracket the last revealed price.':'Stop and target must bracket the pending entry.');
+    p.stop=stop;p.target=target;if(!s.position)p.entry=entry;
+    s.actions.push({cursor:s.cursor,kind:'amend',changes:{stop,target,...(!s.position?{entry}:{})}});
+    s.updatedAt=new Date().toISOString();s.notice='Order levels updated for subsequent candles. Original trade risk is retained.';
+  }
   function cancelOrder(s) {
     if (!s.pending) throw Error('There is no pending order.');
     s.pending=null; s.actions.push({cursor:s.cursor,kind:'cancel'}); s.notice='Pending order cancelled.';
@@ -216,6 +228,7 @@
       if (action.kind === 'order') placeOrder(s,action.order);
       else if (action.kind === 'close') requestClose(s);
       else if(action.kind==='partial-close')requestPartialClose(s,action.quantity);
+      else if(action.kind==='amend')amendOrder(s,action.changes||{});
       else if (action.kind === 'cancel') cancelOrder(s);
       else throw Error('Unknown saved action.');
     }
@@ -240,6 +253,6 @@
     const equity=s.balance+unrealized(s);
     return {trades:completed.length,executions:s.trades.length,wins:wins.length,losses:losses.length,breakeven:completed.length-wins.length-losses.length,winRate:completed.length ? wins.length/completed.length*100 : null,profitFactor:grossLoss>0 ? grossWin/grossLoss : grossWin>0 ? Infinity : null,drawdown,realized,unrealized:unrealized(s),equity,returnPct:(equity/s.startBalance-1)*100,expectancy:completed.length ? completed.reduce((n,t)=>n+t.pnl,0)/completed.length : null};
   }
-  return {research:Research,id,tradeKey,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,requestPartialClose,completedTrades,cancelOrder,snapshot,restore,unrealized,metrics};
+  return {research:Research,id,tradeKey,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,requestPartialClose,amendOrder,completedTrades,cancelOrder,snapshot,restore,unrealized,metrics};
 });
 
