@@ -26,14 +26,14 @@
  function step(s){
   if(!multi(s))return B.step(s);if(finished(s))return false;
   const next=Math.min(...s.markets.filter(m=>m.cursor<m.candles.length-1&&m.candles[m.cursor+1].t<=s.endTime).map(m=>m.candles[m.cursor+1].t));
-  for(const m of s.markets)if(m.cursor<m.candles.length-1&&m.candles[m.cursor+1].t===next)B.step(m);
+  for(const m of s.markets)if(m.cursor<m.candles.length-1&&m.candles[m.cursor+1].t===next){m.viewTimeframe=s.viewTimeframe;m.chartType=s.chartType;B.step(m);}
   s.clock=next;s.equity.push({t:next,value:s.balance+unrealized(s)});if(s.balance+unrealized(s)<=0||s.challenge&&challengeState(s).status==='failed')for(const market of s.markets)if(market.pending){B.cancelOrder(market);market.notice='Pending order cancelled: shared account loss limit reached.';}s.updatedAt=new Date().toISOString();return true;
  }
  function placeOrder(s,order){
   if(!multi(s))return B.placeOrder(s,order);if(finished(s))throw Error('Replay finished.');
   const equity=s.balance+unrealized(s);if(equity<=0)throw Error('The shared simulated account has no positive equity.');
   if(s.challenge&&challengeState(s).status!=='active')throw Error('This practice challenge has finished.');
-  B.placeOrder(active(s),order,equity);active(s).pending.submittedAt=s.clock;const event=active(s).actions.at(-1);s.actions.push({at:s.clock,market:s.activeSymbol,kind:'order',order:{...event.order}});
+  active(s).viewTimeframe=s.viewTimeframe;active(s).chartType=s.chartType;B.placeOrder(active(s),order,equity);active(s).pending.submittedAt=s.clock;const event=active(s).actions.at(-1);s.actions.push({at:s.clock,market:s.activeSymbol,kind:'order',order:{...event.order}});
  }
  function requestClose(s){if(!multi(s))return B.requestClose(s);B.requestClose(active(s));s.actions.push({at:s.clock,market:s.activeSymbol,kind:'close'});}
  function requestPartialClose(s,quantity){if(!multi(s))return B.requestPartialClose(s,quantity);B.requestPartialClose(active(s),quantity);s.actions.push({at:s.clock,market:s.activeSymbol,kind:'partial-close',quantity:Number(quantity)});}
@@ -43,15 +43,15 @@
  function snapshot(s){
   if(!multi(s))return B.snapshot(s);
   const keys=['kind','id','name','description','startBalance','activeSymbol','initialTime','clock','endTime','actions','strategyId','strategySnapshot','challenge','notes','reviews','checklist','viewTimeframe','chartType','createdAt','updatedAt'];
-  return {...Object.fromEntries(keys.map(k=>[k,s[k]])),...(B.research.clean(s.research)?{research:B.research.clean(s.research)}:{}),markets:s.markets.map(m=>Object.fromEntries(['symbol','interval','source','multiplier','fxMode','fee','slippage','candles','drawings','annotations','indicators'].map(k=>[k,m[k]])))};
+  return {...Object.fromEntries(keys.map(k=>[k,s[k]])),...(B.research.clean(s.research)?{research:B.research.clean(s.research)}:{}),markets:s.markets.map(m=>Object.fromEntries(['symbol','interval','source','multiplier','fxMode','fee','slippage','candles','drawings','annotations','indicators','tradeCharts'].map(k=>[k,m[k]])))};
  }
  function restore(raw){
   if(raw?.kind!=='portfolio')return B.restore(raw);
   if(!/^[\w-]{1,100}$/.test(raw.id)||!Number.isInteger(raw.clock)||!Array.isArray(raw.actions)||raw.actions.length>30000)throw Error('Invalid multi-pair session.');
   const s=createPortfolio({...raw,startTime:raw.initialTime},raw.markets);
-  for(const event of raw.actions){if(!event||!Number.isInteger(event.at)||event.at<s.clock||event.at>raw.clock||!s.markets.some(m=>m.symbol===event.market))throw Error('Invalid multi-pair action.');while(s.clock<event.at){if(!step(s))throw Error('Action is outside shared history.');}if(s.clock!==event.at)throw Error('Action does not match a replay candle.');s.activeSymbol=event.market;if(event.kind==='order')placeOrder(s,event.order);else if(event.kind==='close')requestClose(s);else if(event.kind==='partial-close')requestPartialClose(s,event.quantity);else if(event.kind==='amend')amendOrder(s,event.changes||{});else if(event.kind==='cancel')cancelOrder(s);else throw Error('Unknown multi-pair action.');}
+  for(const event of raw.actions){if(!event||!Number.isInteger(event.at)||event.at<s.clock||event.at>raw.clock||!s.markets.some(m=>m.symbol===event.market))throw Error('Invalid multi-pair action.');while(s.clock<event.at){if(!step(s))throw Error('Action is outside shared history.');}if(s.clock!==event.at)throw Error('Action does not match a replay candle.');s.activeSymbol=event.market;if(event.kind==='order')placeOrder(s,{...event.order,chartBefore:event.order.chartBefore??null});else if(event.kind==='close')requestClose(s);else if(event.kind==='partial-close')requestPartialClose(s,event.quantity);else if(event.kind==='amend')amendOrder(s,event.changes||{});else if(event.kind==='cancel')cancelOrder(s);else throw Error('Unknown multi-pair action.');}
   while(s.clock<raw.clock){if(!step(s))throw Error('Saved clock is outside shared history.');}if(s.clock!==raw.clock)throw Error('Invalid saved portfolio clock.');
-  for(const m of s.markets){const saved=raw.markets.find(x=>x.symbol===m.symbol);m.annotations=B.cleanAnnotations(saved.annotations);m.drawings=Array.isArray(saved.drawings)?saved.drawings.filter(n=>Number.isFinite(n)&&n>0).slice(0,30):[];m.indicators=Array.isArray(saved.indicators)?saved.indicators.filter(x=>['SMA20','EMA20','EMA50','EMA200','BB20','RSI14','ATR14','HIGHLOW52','AC','AD','ALMA9','AROON14','ADX14','AVGPRICE','AO','BOP','BBP20','DAYBREAK','WEEKDAYS'].includes(x)).slice(0,20):[];}
+  for(const m of s.markets){const saved=raw.markets.find(x=>x.symbol===m.symbol);m.tradeCharts=B.cleanTradeCharts(saved.tradeCharts,m);m.annotations=B.cleanAnnotations(saved.annotations);m.drawings=Array.isArray(saved.drawings)?saved.drawings.filter(n=>Number.isFinite(n)&&n>0).slice(0,30):[];m.indicators=Array.isArray(saved.indicators)?saved.indicators.filter(x=>['SMA20','EMA20','EMA50','EMA200','BB20','RSI14','ATR14','HIGHLOW52','AC','AD','ALMA9','AROON14','ADX14','AVGPRICE','AO','BOP','BBP20','DAYBREAK','WEEKDAYS'].includes(x)).slice(0,20):[];}
   if(!s.markets.some(m=>m.symbol===raw.activeSymbol))throw Error('Invalid active pair.');s.viewTimeframe=typeof raw.viewTimeframe==='string'?raw.viewTimeframe.slice(0,12):undefined;s.activeSymbol=raw.activeSymbol;s.id=raw.id;s.notes=String(raw.notes||'').slice(0,10000);s.createdAt=String(raw.createdAt||s.createdAt);s.updatedAt=String(raw.updatedAt||s.updatedAt);
   s.checklist=Array.isArray(raw.checklist)?raw.checklist.filter(x=>Number.isInteger(x)&&x>=0&&x<20).slice(0,20):[];const valid=new Set(s.trades.map(B.tradeKey));if(raw.reviews&&typeof raw.reviews==='object')for(const [key,v] of Object.entries(raw.reviews).slice(0,10000))if(valid.has(key)&&v&&typeof v==='object')s.reviews[key]=B.research.cleanReview(v);
   return s;

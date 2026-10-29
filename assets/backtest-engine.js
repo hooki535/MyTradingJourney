@@ -14,6 +14,19 @@
   function cleanFibLevels(raw){const values=Array.isArray(raw)?raw:typeof raw==='string'?raw.split(',').map(x=>x.trim()):[];if(values.length<2||values.length>20||values.some(x=>x===''||!Number.isFinite(Number(x))||Math.abs(Number(x))>10))throw Error('Use 2–20 comma-separated levels between -10 and 10.');const levels=[...new Set(values.map(Number))].sort((a,b)=>a-b);if(levels.length<2)throw Error('Use at least two distinct levels.');return levels;}
   function savedFibLevels(raw){try{return cleanFibLevels(raw);}catch(_){return [0,.236,.382,.5,.618,.786,1];}}
   function cleanAnnotations(rows){return Array.isArray(rows)?rows.filter(a=>Suite.validate(a)).slice(0,200).map(a=>({id:/^[\w-]{1,100}$/.test(a.id)?a.id:id(),type:a.type,...(a.settings&&typeof a.settings==='object'?{settings:Settings.saved(a.type,a.settings)}:{}),...(Array.isArray(a.visibility)?{visibility:a.visibility.filter(x=>Settings.frames.includes(x)).slice(0,16)}:{}),...(a.type==='fib'?{levels:savedFibLevels(a.levels),extendLeft:!!a.extendLeft,extendRight:!!a.extendRight,showPrices:a.showPrices!==false}:{}),points:a.points.map(p=>({i:p.i,p:p.p})),color:/^#[0-9a-f]{6}$/i.test(a.color)?a.color:'#f8c344',width:[1,2,3,4].includes(a.width)?a.width:2,dash:['solid','dashed','dotted'].includes(a.dash)?a.dash:'solid',...(finite(a.offset)?{offset:a.offset}:{}),...(a.anchor&&[a.anchor.x,a.anchor.y].every(n=>finite(n)&&n>=0&&n<=1)?{anchor:{x:a.anchor.x,y:a.anchor.y}}:{}),hidden:!!a.hidden,locked:!!a.locked,text:String(a.text||'Note').slice(0,200),...(finite(a.target)&&a.target>0?{target:a.target}:{})})):[];}
+  function cleanChartState(raw,maxCursor=10000){
+    if(!raw||typeof raw!=='object'||!Number.isInteger(raw.cursor)||raw.cursor<0||raw.cursor>maxCursor)return undefined;
+    return {cursor:raw.cursor,annotations:cleanAnnotations(raw.annotations),drawings:Array.isArray(raw.drawings)?raw.drawings.filter(n=>finite(n)&&n>0).slice(0,30):[],indicators:Array.isArray(raw.indicators)?raw.indicators.filter(id=>Studies.get(id)).slice(0,20):[],viewTimeframe:Settings.frames.includes(raw.viewTimeframe)?raw.viewTimeframe:undefined,chartType:['candles','hollow','bars','line','area'].includes(raw.chartType)?raw.chartType:'candles',...(raw.plan&&['long','short'].includes(raw.plan.side)&&[raw.plan.stop,raw.plan.target].every(n=>finite(n)&&n>0)?{plan:{side:raw.plan.side,type:['market','limit','stop'].includes(raw.plan.type)?raw.plan.type:'market',entry:finite(raw.plan.entry)&&raw.plan.entry>0?raw.plan.entry:null,stop:raw.plan.stop,target:raw.plan.target}}:{})};
+  }
+  function captureChart(s){return cleanChartState({cursor:s.cursor,annotations:s.annotations,drawings:s.drawings,indicators:s.indicators,viewTimeframe:s.viewTimeframe,chartType:s.chartType},s.cursor);}
+  function cleanTradeCharts(raw,s){
+    const out={};if(!raw||typeof raw!=='object'||Array.isArray(raw))return out;
+    for(const t of s.trades){const key=tradeKey(t),value=Object.hasOwn(raw,key)?raw[key]:null;if(!value||typeof value!=='object')continue;
+      const beforeEnd=s.candles.findIndex(b=>b.t>=t.entryTime)-1,afterEnd=s.candles.findIndex(b=>b.t>=t.exitTime),row={};
+      for(const phase of ['before','after','beforeReview','afterReview']){const state=cleanChartState(value[phase],phase.startsWith('before')?beforeEnd:afterEnd);if(state)row[phase]=state;}
+      if(Object.keys(row).length)out[key]=row;
+    }return out;
+  }
   function cleanChallenge(c){if(!c || typeof c!=='object')return null;const rule={name:String(c.name || 'Practice challenge').slice(0,80),targetPct:Number(c.targetPct),dailyLossPct:Number(c.dailyLossPct),maxLossPct:Number(c.maxLossPct),minDays:Number(c.minDays),trailing:!!c.trailing};if(![rule.targetPct,rule.dailyLossPct,rule.maxLossPct].every(n=>finite(n)&&n>0&&n<=100)||!Number.isInteger(rule.minDays)||rule.minDays<1||rule.minDays>100)throw Error('Invalid practice challenge rules.');return rule;}
   function challengeState(s,marked=unrealized(s)){
     if(!s.challenge)return null;const r=s.challenge;let peak=s.startBalance,day=null,dayBase=s.startBalance,last=s.startBalance,failed=null;
@@ -84,7 +97,7 @@
     const balance = Number(options.startBalance), multiplier = Number(options.multiplier), fee = Number(options.fee || 0), slippage = Number(options.slippage || 0);
     if (!finite(balance) || balance <= 0 || balance > 1e9 || !finite(multiplier) || multiplier <= 0 || multiplier > 1e9 || !finite(fee) || fee < 0 || !finite(slippage) || slippage < 0) throw Error('Check balance, cash multiplier, fees and slippage.');
     const cursor = Math.max(29, Math.min(candles.length-2, Number.isInteger(options.cursor) ? options.cursor : Math.min(99, Math.max(29,candles.length-31))));
-    return {id:id(), name:String(options.name || options.symbol || 'Replay').slice(0,80), symbol:String(options.symbol || 'CUSTOM').slice(0,64), interval:String(options.interval || 'CSV').slice(0,12), source:String(options.source || 'User-imported CSV').slice(0,180), strategyId:String(options.strategyId || ''), strategySnapshot:strategyCopy(options.strategySnapshot), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), startBalance:balance, balance, multiplier, fxMode, chartType:['candles','hollow','bars','line','area'].includes(options.chartType)?options.chartType:'candles', fee, slippage, candles, cursor, initialCursor:cursor, position:null, pending:null, trades:[], equity:[{t:candles[cursor].t, value:balance}], notes:'',description:String(options.description||'').slice(0,2000),challenge:cleanChallenge(options.challenge),annotations:[],reviews:{},...(Research.clean(options.research)?{research:Research.clean(options.research)}:{}),indicators:['DAYBREAK','WEEKDAYS'],checklist:[],drawings:[],actions:[],notice:''};
+    return {id:id(), name:String(options.name || options.symbol || 'Replay').slice(0,80), symbol:String(options.symbol || 'CUSTOM').slice(0,64), interval:String(options.interval || 'CSV').slice(0,12), source:String(options.source || 'User-imported CSV').slice(0,180), strategyId:String(options.strategyId || ''), strategySnapshot:strategyCopy(options.strategySnapshot), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), startBalance:balance, balance, multiplier, fxMode, chartType:['candles','hollow','bars','line','area'].includes(options.chartType)?options.chartType:'candles', fee, slippage, candles, cursor, initialCursor:cursor, position:null, pending:null, trades:[], equity:[{t:candles[cursor].t, value:balance}], notes:'',description:String(options.description||'').slice(0,2000),challenge:cleanChallenge(options.challenge),annotations:[],reviews:{},...(Research.clean(options.research)?{research:Research.clean(options.research)}:{}),indicators:['DAYBREAK','WEEKDAYS'],checklist:[],drawings:[],actions:[],tradeCharts:{},notice:''};
   }
   function placeOrder(s, order, availableEquity) {
     if(s.challenge && challengeState(s).status!=='active')throw Error('This practice challenge has finished. Start a new attempt.');
@@ -97,8 +110,10 @@
     if (!['long','short'].includes(side) || !['market','limit','stop'].includes(type) || !finite(quantity) || quantity <= 0 || quantity > 1e9 || !finite(stop) || stop <= 0 || !finite(target) || target <= 0 || (type !== 'market' && (!finite(entry) || entry <= 0))) throw Error('Enter a valid side, quantity, stop and target.');
     const reference = entry || s.candles[s.cursor].c;
     if (side === 'long' ? !(stop < reference && reference < target) : !(target < reference && reference < stop)) throw Error('Long orders need stop < entry < target; short orders need target < entry < stop.');
-    s.pending = {id:id(), side, type, quantity, stop, target, entry, submittedAt:s.candles[s.cursor].t};
-    s.actions.push({cursor:s.cursor, kind:'order', order:{side,type,quantity,stop,target,entry}});
+    const chartBefore=Object.hasOwn(order,'chartBefore')?cleanChartState(order.chartBefore,s.cursor):captureChart(s);
+    if(chartBefore&&!chartBefore.plan)chartBefore.plan={side,type,entry,stop,target};
+    s.pending = {id:id(), side, type, quantity, stop, target, entry, submittedAt:s.candles[s.cursor].t,...(chartBefore?{chartBefore}:{})};
+    s.actions.push({cursor:s.cursor, kind:'order', order:{side,type,quantity,stop,target,entry,...(chartBefore?{chartBefore}:{})}});
     s.notice = 'Order queued. First eligible on the next candle.';
   }
   function cashMultiplier(s, price=s.candles[s.cursor].c) {
@@ -118,6 +133,7 @@
     const remaining=Math.max(0,p.quantity-qty),allocatedRisk=p.riskCash*qty/p.quantity,initialRisk=p.initialRiskCash||p.riskCash;
     s.balance+=gross-exitFee;
     s.trades.push({...p,quantity:qty,riskCash:allocatedRisk,exit,exitTime:time,reason,gross,fees:2*exitFee,pnl,r:initialRisk>0?pnl/initialRisk:null,...(p.partialSeries?{exitLeg:(p.exitLegCount||0),remainingQuantity:remaining}:{} )});
+    const closed=s.trades.at(-1);s.tradeCharts??={};s.tradeCharts[tradeKey(closed)]={...(p.chartBefore?{before:cleanChartState(p.chartBefore,s.cursor)}:{}),after:captureChart(s)};
     if(remaining>0){p.quantity=remaining;p.riskCash-=allocatedRisk;p.exitLegCount=(p.exitLegCount||0)+1;p.closeRequested=false;delete p.closeQuantity;}
     else s.position=null;
   }
@@ -214,7 +230,7 @@
     s.pending=null; s.actions.push({cursor:s.cursor,kind:'cancel'}); s.notice='Pending order cancelled.';
   }
   function snapshot(s) {
-    const keys=['id','name','symbol','interval','source','strategyId','strategySnapshot','createdAt','updatedAt','viewTimeframe','chartType','startBalance','multiplier','fxMode','fee','slippage','candles','initialCursor','cursor','actions','notes','drawings','description','challenge','annotations','reviews','indicators','checklist'];
+    const keys=['id','name','symbol','interval','source','strategyId','strategySnapshot','createdAt','updatedAt','viewTimeframe','chartType','startBalance','multiplier','fxMode','fee','slippage','candles','initialCursor','cursor','actions','notes','drawings','description','challenge','annotations','reviews','tradeCharts','indicators','checklist'];
     return {...Object.fromEntries(keys.map(k=>[k,s[k]])),...(Research.clean(s.research)?{research:Research.clean(s.research)}:{})};
   }
   function restore(raw) {
@@ -225,7 +241,7 @@
     for (const action of raw.actions) {
       if (!Number.isInteger(action.cursor) || action.cursor < s.cursor || action.cursor > raw.cursor) throw Error('Invalid saved action sequence.');
       while (s.cursor < action.cursor) step(s);
-      if (action.kind === 'order') placeOrder(s,action.order);
+      if (action.kind === 'order') placeOrder(s,{...action.order,chartBefore:action.order.chartBefore??null});
       else if (action.kind === 'close') requestClose(s);
       else if(action.kind==='partial-close')requestPartialClose(s,action.quantity);
       else if(action.kind==='amend')amendOrder(s,action.changes||{});
@@ -238,6 +254,7 @@
     s.updatedAt=typeof raw.updatedAt === 'string' ? raw.updatedAt : s.updatedAt;
     s.indicators=Array.isArray(raw.indicators)?raw.indicators.filter(x=>['SMA20','EMA20','EMA50','EMA200','BB20','RSI14','ATR14','HIGHLOW52','AC','AD','ALMA9','AROON14','ADX14','AVGPRICE','AO','BOP','BBP20','DAYBREAK','WEEKDAYS'].includes(x)).slice(0,20):[];
     s.viewTimeframe=typeof raw.viewTimeframe==='string'?raw.viewTimeframe.slice(0,12):undefined;s.annotations=cleanAnnotations(raw.annotations);
+    s.tradeCharts=cleanTradeCharts(raw.tradeCharts,s);
     const validKeys=new Set(s.trades.map(tradeKey));s.reviews={};
     if(raw.reviews && typeof raw.reviews==='object')for(const [k,v] of Object.entries(raw.reviews).slice(0,10000))if(validKeys.has(k) && v && typeof v==='object')s.reviews[k]=Research.cleanReview(v);
     s.checklist=Array.isArray(raw.checklist)?raw.checklist.filter(x=>Number.isInteger(x)&&x>=0&&x<20).slice(0,20):[];
@@ -253,6 +270,6 @@
     const equity=s.balance+unrealized(s);
     return {trades:completed.length,executions:s.trades.length,wins:wins.length,losses:losses.length,breakeven:completed.length-wins.length-losses.length,winRate:completed.length ? wins.length/completed.length*100 : null,profitFactor:grossLoss>0 ? grossWin/grossLoss : grossWin>0 ? Infinity : null,drawdown,realized,unrealized:unrealized(s),equity,returnPct:(equity/s.startBalance-1)*100,expectancy:completed.length ? completed.reduce((n,t)=>n+t.pnl,0)/completed.length : null};
   }
-  return {research:Research,id,tradeKey,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,requestPartialClose,amendOrder,completedTrades,cancelOrder,snapshot,restore,unrealized,metrics};
+  return {research:Research,id,tradeKey,captureChart,cleanChartState,cleanTradeCharts,cashMultiplier,cleanFibLevels,cleanAnnotations,cleanChallenge,challengeState,validateBars,parseCSV,parseCSVRecords,createSession,placeOrder,step,requestClose,requestPartialClose,amendOrder,completedTrades,cancelOrder,snapshot,restore,unrealized,metrics};
 });
 
