@@ -34,10 +34,5 @@
     document.querySelectorAll('[data-vision]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
     const [title,description]=visions[button.dataset.vision];const target=document.getElementById('vision-detail');target.replaceChildren();const h=document.createElement('h3'),p=document.createElement('p');h.textContent=title;p.textContent=description;target.append(h,p);
   }));
-  const menu=document.querySelector('.menu-toggle'),nav=document.getElementById('main-nav');
-  function closeMenu(){menu.setAttribute('aria-expanded','false');nav.classList.remove('open');}
-  menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('open',open);});
-  nav.addEventListener('click',event=>{if(event.target.closest('a'))closeMenu();});
-  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&menu.getAttribute('aria-expanded')==='true'){closeMenu();menu.focus();}});
-  document.getElementById('year').textContent=new Date().getFullYear();render();
+  render();
 })();
