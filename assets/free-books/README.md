@@ -2,6 +2,13 @@
 
 Only public-domain texts are bundled. User-uploaded commercial PDFs remain private account files and are never committed here.
 
+## Think and Grow Rich
+
+- Napoleon Hill, original 1937 text, reproduced from the 1938 Ralston Society printing.
+- Complete 254-page PDF downloaded from https://gneiss.io/assets/document/ThinkAndGrowRich.pdf.
+- The source identifies itself as a complete reproduction of the public-domain original. Source and original publication notices are retained; this is not a modern revised edition or a summary.
+- Independent public-domain catalog listing: https://soilandhealth.org/book/think-and-grow-rich/.
+
 ## Reminiscences of a Stock Operator
 
 - Edwin Lefèvre, original work published 1923.

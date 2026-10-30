@@ -79,6 +79,7 @@
     return state;
   }
   const freeSources={
+    'think-and-grow-rich':{title:'Free PDF · original edition',url:'../assets/free-books/think-and-grow-rich.pdf',source:'https://gneiss.io/assets/document/ThinkAndGrowRich.pdf',label:'Public-domain text · original 1937 edition',pdf:true},
     almanack:{title:'Download official free PDF',url:'https://navalmanack.s3.amazonaws.com/Eric-Jorgenson_The-Almanack-of-Naval-Ravikant_Final.pdf',source:'https://www.navalmanack.com/',label:'Navalmanack · official free edition',pdf:false},
     reminiscences:{title:'Free PDF · Project Gutenberg',url:'../assets/free-books/reminiscences.pdf',source:'https://www.gutenberg.org/ebooks/60979',label:'Project Gutenberg · complete transcription',pdf:true},
     'richest-man-in-babylon':{title:'Free PDF · 1926 edition',url:'../assets/free-books/richest-man-in-babylon.pdf',source:'https://www.globalgreyebooks.com/book-page/richest-man-in-babylon-ebook.html',label:'Public-domain text · 1926 edition',pdf:true}
