@@ -4,10 +4,15 @@ The library imports owned PDFs through the signed-in user's existing private
 storage workflow. Personal books and generated reading copies stay outside Git;
 only code, tests and this documentation belong in the repository.
 
-Batch imports now reject empty files, match common catalog filename variations,
-and skip existing PDFs and SHA-256 duplicates. New personal book identifiers are
-derived from the PDF hash so retries do not create another book. Existing notes
-and covers are kept. Filenames marked as excerpts retain a visible excerpt label.
+Batch attachment rejects empty files, matches common catalog filename variations,
+and skips existing PDFs and SHA-256 duplicates. Unmatched files are skipped: this
+action never creates a book title. Existing notes and covers are kept. Filenames
+marked as excerpts retain a visible excerpt label.
+
+Records with `libraryArchived: true` are excluded from the reading path. Archiving
+preserves their private files and record contents and can be reversed. The extra
+entries created by the earlier broad import have been archived; the original
+catalog remains the reading path.
 
 The library can display an older filename-based record under its matching catalog
 title when no canonical record exists. Its existing reader link, storage object,

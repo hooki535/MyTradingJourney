@@ -18,6 +18,11 @@ test('batch matching keeps existing PDFs and reading notes for catalog aliases',
 test('hash matching prevents renamed duplicates and empty PDFs are rejected before upload',async()=>{
  const contents='existing PDF bytes',hash=Buffer.from(await webcrypto.subtle.digest('SHA-256',Buffer.from(contents))).toString('hex');
  const records=[{id:'book:personal',payload:{pdfPath:'owner/file.pdf',pdfSha256:hash}}];
- const result=await run([new File([contents],'another-name.pdf',{type:'application/pdf'}),new File([],'empty.pdf',{type:'application/pdf'})],records);
+ const result=await run([new File([contents],'Atomic Habits - renamed.pdf',{type:'application/pdf'}),new File([],'empty.pdf',{type:'application/pdf'})],records);
  assert.equal(result.uploads,0);assert.equal(result.saves,0);assert.match(result.message,/1 existing or duplicate/);assert.match(result.message,/empty.pdf: Empty PDF/);
+});
+
+test('unmatched PDF files never create new library titles or upload objects',async()=>{
+ const result=await run([new File(['a PDF'],'A different trading book.pdf',{type:'application/pdf'})],[]);
+ assert.equal(result.uploads,0);assert.equal(result.saves,0);assert.match(result.message,/Attached 0 PDFs to existing titles/);assert.match(result.message,/Skipped 1 files without a matching library title/);
 });
