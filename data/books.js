@@ -185,7 +185,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 735,
-      "coverHeight": 1111
+      "coverHeight": 1111,
+      "cardSummary": "Build reliable habits by changing the cues, effort, and rewards around everyday actions. Learn how small repetitions shape identity, why your environment matters, and how to restart after a missed day.",
+      "cardLearn": [
+        "Design cues for consistent preparation",
+        "Make useful habits easier to start",
+        "Recover without abandoning your routine"
+      ],
+      "cardPractice": "Place your journal beside your laptop and write one line before opening a chart.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "rich-dad-poor-dad",
@@ -370,7 +379,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 663,
-      "coverHeight": 1000
+      "coverHeight": 1000,
+      "cardSummary": "Explore financial literacy through contrasting attitudes to income, ownership, and work. The book encourages you to examine cash flow and develop useful skills; its stories are a starting point for questions, not a complete investment plan.",
+      "cardLearn": [
+        "Understand income, expenses, and obligations",
+        "Question what actually produces cash flow",
+        "Build skills beyond a single paycheck"
+      ],
+      "cardPractice": "Map one month of dependable income and essential expenses separately from trading results.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "psychology-of-money",
@@ -555,7 +573,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 360,
-      "coverHeight": 540
+      "coverHeight": 540,
+      "cardSummary": "Discover how personal experience, patience, luck, and comparison shape financial decisions. Learn why keeping wealth can require different behavior from pursuing it, and why a workable plan needs room for an uncertain future.",
+      "cardLearn": [
+        "Define your own version of enough",
+        "Allow room for financial surprises",
+        "Separate visible spending from lasting wealth"
+      ],
+      "cardPractice": "Write a personal definition of financial security without mentioning anyone else’s lifestyle.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "mindset",
@@ -740,7 +767,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 319,
-      "coverHeight": 500
+      "coverHeight": 500,
+      "cardSummary": "Examine how beliefs about ability influence your response to difficulty. Learn to treat feedback as information, change an ineffective strategy, and use deliberate practice to develop skills instead of defending a fixed picture of yourself.",
+      "cardLearn": [
+        "Turn setbacks into specific learning questions",
+        "Seek feedback you can act on",
+        "Improve your strategy, not just effort"
+      ],
+      "cardPractice": "Rewrite one recent mistake as an observable behavior and one practice adjustment.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "think-and-grow-rich",
@@ -925,7 +961,17 @@ return {
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1030
+      "coverHeight": 1030,
+      "cardSummary": "Explore a motivational approach to purpose, planning, persistence, and cooperation. Use its broad ideas to organize a goal and seek informed feedback, while testing claims against evidence rather than treating confidence as a guarantee of wealth.",
+      "cardLearn": [
+        "Give an ambition a clear objective",
+        "Translate intention into a practical plan",
+        "Revise your approach using informed feedback"
+      ],
+      "cardPractice": "Choose one learning goal and schedule the next concrete step this week.",
+      "chapterCount": 15,
+      "chapterSource": "reader.html?book=think-and-grow-rich",
+      "chapterEdition": "Bundled reading edition; count follows its numbered contents, including the introduction where numbered."
     },
     {
       "id": "trading-in-the-zone",
@@ -1110,7 +1156,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 735,
-      "coverHeight": 1142
+      "coverHeight": 1142,
+      "cardSummary": "Understand how expectations and beliefs can interfere with execution. The book explores accepting uncertainty, thinking across a series of trades, and taking responsibility for your actions without demanding a particular outcome from the next setup.",
+      "cardLearn": [
+        "Distinguish decision quality from one outcome",
+        "Recognize fear-driven changes to a plan",
+        "Evaluate a series of comparable decisions"
+      ],
+      "cardPractice": "Review a completed trade for rule adherence before looking at its profit or loss.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "disciplined-trader",
@@ -1295,7 +1350,16 @@ return {
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 397,
-      "coverHeight": 600
+      "coverHeight": 600,
+      "cardSummary": "Explore the psychological demands of trading, including emotional reactions, responsibility, and consistent behavior. Use the ideas to observe your execution patterns and prepare more deliberately instead of relying on willpower during a difficult market moment.",
+      "cardLearn": [
+        "Identify recurring emotional triggers",
+        "Describe execution errors without self-judgment",
+        "Prepare a response before pressure arrives"
+      ],
+      "cardPractice": "Record a trigger, the action it produced, and a response to rehearse in replay.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "trading-for-a-living",
@@ -1480,7 +1544,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1170
+      "coverHeight": 1170,
+      "cardSummary": "Connect personal psychology, analytical method, and exposure management into a more complete trading process. Learn to ask what each chart tool contributes, keep useful records, and review behavior alongside the technical reasoning behind a decision.",
+      "cardLearn": [
+        "Connect psychology, method, and exposure",
+        "Choose chart tools for specific questions",
+        "Keep records that support a useful review"
+      ],
+      "cardPractice": "Audit a study chart: explain the question each indicator is supposed to answer.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "thinking-fast-and-slow",
@@ -1665,7 +1738,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 735,
-      "coverHeight": 1101
+      "coverHeight": 1101,
+      "cardSummary": "Explore the tension between quick intuitive judgments and slower deliberate reasoning. Learn how anchors, memorable examples, and overconfidence can distort an assessment, and why checking a compelling impression against broader evidence is often worthwhile.",
+      "cardLearn": [
+        "Notice anchors in your first judgment",
+        "Compare confidence with available evidence",
+        "Use an outside view of outcomes"
+      ],
+      "cardPractice": "Write your first impression of a setup, then list evidence that could challenge it.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "reminiscences",
@@ -1850,7 +1932,17 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1104
+      "coverHeight": 1104,
+      "cardSummary": "Follow a fictionalized account of a speculator navigating ambition, mistakes, and changing markets. The stories invite reflection on patience, overtrading, conviction, and ego; use them to question your process rather than copy historical trades.",
+      "cardLearn": [
+        "Separate patience from stubborn attachment",
+        "Recognize the cost of unnecessary activity",
+        "Read success stories with historical context"
+      ],
+      "cardPractice": "Compare one narrated mistake with a pattern in your own journal.",
+      "chapterCount": 24,
+      "chapterSource": "reader.html?book=reminiscences",
+      "chapterEdition": "Bundled reading edition; count follows its numbered contents, including the introduction where numbered."
     },
     {
       "id": "market-wizards",
@@ -2035,7 +2127,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 600,
-      "coverHeight": 898
+      "coverHeight": 898,
+      "cardSummary": "Learn from interviews with traders who use very different methods. Compare the recurring importance of risk, self-knowledge, and independent thinking, while remembering that selected success stories cannot establish whether a method will work for you.",
+      "cardLearn": [
+        "Separate a principle from a personality",
+        "Assess whether a method fits you",
+        "Study setbacks as carefully as successes"
+      ],
+      "cardPractice": "Compare two interviewees and identify one shared principle despite their different methods.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "technical-analysis",
@@ -2220,7 +2321,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 375,
-      "coverHeight": 491
+      "coverHeight": 491,
+      "cardSummary": "Build a vocabulary for studying trends, chart patterns, indicators, and market context. Learn to define what you are observing before drawing conclusions, and distinguish a useful chart description from evidence that a repeatable trading edge exists.",
+      "cardLearn": [
+        "Describe trends and levels more precisely",
+        "Give every indicator a clear purpose",
+        "Keep definitions consistent during replay"
+      ],
+      "cardPractice": "Define one chart pattern in observable terms before collecting replay examples.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "intelligent-investor",
@@ -2405,7 +2515,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1130
+      "coverHeight": 1130,
+      "cardSummary": "Study a disciplined approach to investing that separates price from value and speculation from investment. Explore temperament, analytical uncertainty, and the importance of leaving room for error when forming a long-term judgment about an asset.",
+      "cardLearn": [
+        "Separate investing from short-term speculation",
+        "Question enthusiasm driven only by price",
+        "Account for uncertainty in your estimates"
+      ],
+      "cardPractice": "Label each financial goal as saving, investing, or speculation and explain why.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "fooled-by-randomness",
@@ -2590,7 +2709,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 329,
-      "coverHeight": 500
+      "coverHeight": 500,
+      "cardSummary": "Examine how luck can hide behind convincing success stories and confident explanations. Learn to consider paths that could have occurred, question small samples, and assess the decision process even when the observed outcome looks impressive.",
+      "cardLearn": [
+        "Separate favorable outcomes from sound decisions",
+        "Question survivorship in success stories",
+        "Consider plausible alternative outcomes"
+      ],
+      "cardPractice": "Choose a winning trade that broke a rule and describe how it could have ended.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "black-swan",
@@ -2775,7 +2903,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1120
+      "coverHeight": 1120,
+      "cardSummary": "Explore the limits of prediction when rare, consequential events fall outside familiar experience. Learn to question tidy explanations after the fact, recognize model boundaries, and consider how a plan behaves when its usual assumptions fail.",
+      "cardLearn": [
+        "Recognize gaps in familiar historical data",
+        "Question explanations built after an event",
+        "Identify fragile assumptions in a plan"
+      ],
+      "cardPractice": "List three assumptions your study process depends on and one disruption for each.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "antifragile",
@@ -2960,7 +3097,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1131
+      "coverHeight": 1131,
+      "cardSummary": "Explore why some systems break under stress while others improve through variation. Learn to examine asymmetry, preserve options, remove avoidable complexity, and design experiments whose learning value does not depend on risking ruin.",
+      "cardLearn": [
+        "Distinguish resilience from improvement under stress",
+        "Design experiments with recoverable downsides",
+        "Remove complexity that creates hidden fragility"
+      ],
+      "cardPractice": "Choose a small replay experiment and define its learning goal before starting.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "almanack",
@@ -3145,7 +3291,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1147
+      "coverHeight": 1147,
+      "cardSummary": "Explore collected ideas about wealth, judgment, and a considered life. Learn how distinctive skills, useful tools, ownership, and long relationships can shape your work, while examining whether your goals reflect personal values or the pursuit of status.",
+      "cardLearn": [
+        "Combine skills into useful specific knowledge",
+        "Use tools to extend valuable work",
+        "Define success beyond comparison and status"
+      ],
+      "cardPractice": "Identify one real problem your combination of coding and trading knowledge could help solve.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "zero-to-one",
@@ -3330,7 +3485,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1104
+      "coverHeight": 1104,
+      "cardSummary": "Examine how a business can create a distinct benefit rather than reproduce what already exists. Learn to question assumptions about competition, start with a focused audience, and consider distribution alongside the product you want to build.",
+      "cardLearn": [
+        "Define a benefit customers cannot easily substitute",
+        "Start with a specific customer problem",
+        "Plan how the product reaches its audience"
+      ],
+      "cardPractice": "Describe a narrow customer problem and what would make your solution meaningfully different.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "lean-startup",
@@ -3515,7 +3679,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 392,
-      "coverHeight": 600
+      "coverHeight": 600,
+      "cardSummary": "Turn a business idea into a series of explicit assumptions and small tests. Learn to observe real behavior, choose measurements that reveal learning, and decide when to adjust direction before committing more time or resources.",
+      "cardLearn": [
+        "Make assumptions visible before building",
+        "Test demand through observable behavior",
+        "Use evidence to decide what changes"
+      ],
+      "cardPractice": "Write one product hypothesis and the smallest test that could disprove it.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "shoe-dog",
@@ -3700,7 +3873,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 735,
-      "coverHeight": 1110
+      "coverHeight": 1110,
+      "cardSummary": "Follow the uncertain early years behind Nike through a founder’s memoir. The story reveals the relationships, operational problems, financing pressures, and persistence behind a recognizable brand, while offering one person’s account rather than a universal formula.",
+      "cardLearn": [
+        "Recognize the operational work behind a brand",
+        "Understand pressure from obligations and growth",
+        "Value collaboration through difficult periods"
+      ],
+      "cardPractice": "Choose one difficult episode and identify the obligation that made it harder.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "millionaire-fastlane",
@@ -3885,7 +4067,16 @@ return {
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 333,
-      "coverHeight": 500
+      "coverHeight": 500,
+      "cardSummary": "Explore an entrepreneurial argument for building value through businesses rather than relying only on hours worked. Use its questions about customer need, control, reach, and time dependence to examine an idea without assuming scale or wealth is guaranteed.",
+      "cardLearn": [
+        "Start with a specific customer need",
+        "Identify dependence on platforms or gatekeepers",
+        "Examine workload before assuming scalability"
+      ],
+      "cardPractice": "Write who needs your proposed product, what they use now, and why they might switch.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "ten-times-rule",
@@ -4070,7 +4261,16 @@ return {
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1089
+      "coverHeight": 1089,
+      "cardSummary": "Examine an argument for larger goals and sustained action. Use it to estimate the work behind an ambition, take initiative, and compare activity with useful results, while keeping effort targets separate from financial exposure or trading risk.",
+      "cardLearn": [
+        "Estimate work hidden behind an ambitious goal",
+        "Turn intention into scheduled action",
+        "Measure progress beyond hours spent working"
+      ],
+      "cardPractice": "Break one project goal into three observable actions with realistic time estimates.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "ego-is-the-enemy",
@@ -4255,7 +4455,16 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 736,
-      "coverHeight": 1127
+      "coverHeight": 1127,
+      "cardSummary": "Explore how the need to appear capable can obstruct learning, useful work, and recovery from failure. Learn to stay receptive to feedback, evaluate success honestly, and direct attention toward the task rather than defending your reputation.",
+      "cardLearn": [
+        "Receive feedback without immediately defending yourself",
+        "Keep success connected to honest review",
+        "Focus on useful work over appearances"
+      ],
+      "cardPractice": "Write one piece of uncomfortable feedback and a practical way to test it.",
+      "chapterCount": null,
+      "chapterSource": null
     },
     {
       "id": "richest-man-in-babylon",
@@ -4440,7 +4649,17 @@ return {
       "reviewNote": "",
       "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
       "coverWidth": 645,
-      "coverHeight": 1000
+      "coverHeight": 1000,
+      "cardSummary": "Use simple financial parables to reflect on retaining income, managing spending, and seeking informed advice. The lessons encourage a repeatable money routine and careful judgment about opportunities, rather than treating speculation as a substitute for saving.",
+      "cardLearn": [
+        "Separate retained income from trading capital",
+        "Question advice before committing money",
+        "Build a repeatable spending and saving review"
+      ],
+      "cardPractice": "Review recurring expenses and choose one sustainable saving action for the next month.",
+      "chapterCount": 11,
+      "chapterSource": "reader.html?book=richest-man-in-babylon",
+      "chapterEdition": "Bundled reading edition; count follows its numbered contents, including the introduction where numbered."
     }
   ],
   "needsReview": [
