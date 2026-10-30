@@ -12,11 +12,11 @@
     const callback=new URLSearchParams(location.search).has('code')||/^#(?:access_token|error)=/.test(location.hash);
     if(replay||workspace||callback)location.replace((replay?'pages/backtesting.html':'pages/journey.html')+location.search+(location.hash||'#home'));
   </script>
-  <script defer src="assets/home.js?v=20261030ref1"></script>
+  <script defer src="assets/book-artwork.js?v=20261030supplied"></script><script defer src="assets/home.js?v=20261030supplied"></script>
   <link rel="stylesheet" href="assets/public-site.css?v=20261030ref1">
   <script defer src="assets/field-notes.js?v=20261030ref1"></script>
   <script defer src="assets/public-site.js?v=20261030ref1"></script>
-</head>
+<link rel="stylesheet" href="css/book-shelf.css?v=20261030supplied"></head>
 <body class="ref-site" data-public-page="home">
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header ref-header">

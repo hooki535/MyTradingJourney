@@ -9,7 +9,7 @@ return {
       "author": "James Clear",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/atomic-habits.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/atomic-habits.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -183,7 +183,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 735,
+      "coverHeight": 1111
     },
     {
       "id": "rich-dad-poor-dad",
@@ -192,7 +194,7 @@ return {
       "author": "Robert Kiyosaki",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/rich-dad-poor-dad.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/rich-dad-poor-dad.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -366,7 +368,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 663,
+      "coverHeight": 1000
     },
     {
       "id": "psychology-of-money",
@@ -549,7 +553,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 360,
+      "coverHeight": 540
     },
     {
       "id": "mindset",
@@ -558,7 +564,7 @@ return {
       "author": "Carol Dweck",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/mindset.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/mindset.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -732,7 +738,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 319,
+      "coverHeight": 500
     },
     {
       "id": "think-and-grow-rich",
@@ -741,7 +749,7 @@ return {
       "author": "Napoleon Hill",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/think-and-grow-rich.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/think-and-grow-rich.jpg?v=20261030supplied",
       "pdf": "../assets/free-books/think-and-grow-rich.pdf",
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -915,7 +923,9 @@ return {
       ],
       "needsReview": true,
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1030
     },
     {
       "id": "trading-in-the-zone",
@@ -924,7 +934,7 @@ return {
       "author": "Mark Douglas",
       "category": "Trading psychology",
       "status": "to-read",
-      "cover": "../assets/book-covers/trading-in-the-zone.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/trading-in-the-zone.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -1098,7 +1108,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 735,
+      "coverHeight": 1142
     },
     {
       "id": "disciplined-trader",
@@ -1107,7 +1119,7 @@ return {
       "author": "Mark Douglas",
       "category": "Trading psychology",
       "status": "to-read",
-      "cover": "../assets/book-covers/disciplined-trader.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/disciplined-trader.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -1281,7 +1293,9 @@ return {
       ],
       "needsReview": true,
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 397,
+      "coverHeight": 600
     },
     {
       "id": "trading-for-a-living",
@@ -1290,7 +1304,7 @@ return {
       "author": "Alexander Elder",
       "category": "Trading psychology",
       "status": "to-read",
-      "cover": "../assets/book-covers/trading-for-a-living.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/trading-for-a-living.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -1464,7 +1478,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1170
     },
     {
       "id": "thinking-fast-and-slow",
@@ -1473,7 +1489,7 @@ return {
       "author": "Daniel Kahneman",
       "category": "Trading psychology",
       "status": "to-read",
-      "cover": "../assets/book-covers/thinking-fast-and-slow.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/thinking-fast-and-slow.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -1647,7 +1663,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 735,
+      "coverHeight": 1101
     },
     {
       "id": "reminiscences",
@@ -1656,7 +1674,7 @@ return {
       "author": "Edwin Lefèvre",
       "category": "Markets & investing",
       "status": "to-read",
-      "cover": "../assets/book-covers/reminiscences.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/reminiscences.jpg?v=20261030supplied",
       "pdf": "../assets/free-books/reminiscences.pdf",
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -1830,7 +1848,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1104
     },
     {
       "id": "market-wizards",
@@ -1839,7 +1859,7 @@ return {
       "author": "Jack Schwager",
       "category": "Markets & investing",
       "status": "to-read",
-      "cover": "../assets/book-covers/market-wizards.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/market-wizards.jpg?v=20261030supplied",
       "pdf": null,
       "pages": 480,
       "pagesNote": "Reference edition; your PDF may differ.",
@@ -2013,7 +2033,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 600,
+      "coverHeight": 898
     },
     {
       "id": "technical-analysis",
@@ -2022,7 +2044,7 @@ return {
       "author": "John Murphy",
       "category": "Markets & investing",
       "status": "to-read",
-      "cover": "../assets/book-covers/technical-analysis.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/technical-analysis.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -2196,7 +2218,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 375,
+      "coverHeight": 491
     },
     {
       "id": "intelligent-investor",
@@ -2205,7 +2229,7 @@ return {
       "author": "Benjamin Graham",
       "category": "Markets & investing",
       "status": "to-read",
-      "cover": "../assets/book-covers/intelligent-investor.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/intelligent-investor.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -2379,7 +2403,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1130
     },
     {
       "id": "fooled-by-randomness",
@@ -2388,7 +2414,7 @@ return {
       "author": "Nassim Taleb",
       "category": "Risk & uncertainty",
       "status": "to-read",
-      "cover": "../assets/book-covers/fooled-by-randomness.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/fooled-by-randomness.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -2562,7 +2588,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 329,
+      "coverHeight": 500
     },
     {
       "id": "black-swan",
@@ -2571,7 +2599,7 @@ return {
       "author": "Nassim Taleb",
       "category": "Risk & uncertainty",
       "status": "to-read",
-      "cover": "../assets/book-covers/black-swan.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/black-swan.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -2745,7 +2773,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1120
     },
     {
       "id": "antifragile",
@@ -2754,7 +2784,7 @@ return {
       "author": "Nassim Taleb",
       "category": "Risk & uncertainty",
       "status": "to-read",
-      "cover": "../assets/book-covers/antifragile.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/antifragile.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -2928,7 +2958,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1131
     },
     {
       "id": "almanack",
@@ -2937,7 +2969,7 @@ return {
       "author": "Eric Jorgenson",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/almanack.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/almanack.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -3111,7 +3143,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1147
     },
     {
       "id": "zero-to-one",
@@ -3120,7 +3154,7 @@ return {
       "author": "Peter Thiel",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/zero-to-one.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/zero-to-one.jpg?v=20261030supplied",
       "pdf": null,
       "pages": 224,
       "pagesNote": "Reference edition; your PDF may differ.",
@@ -3294,7 +3328,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1104
     },
     {
       "id": "lean-startup",
@@ -3303,7 +3339,7 @@ return {
       "author": "Eric Ries",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/lean-startup.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/lean-startup.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -3477,7 +3513,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 392,
+      "coverHeight": 600
     },
     {
       "id": "shoe-dog",
@@ -3486,7 +3524,7 @@ return {
       "author": "Phil Knight",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/shoe-dog.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/shoe-dog.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -3660,7 +3698,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 735,
+      "coverHeight": 1110
     },
     {
       "id": "millionaire-fastlane",
@@ -3669,7 +3709,7 @@ return {
       "author": "MJ DeMarco",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/millionaire-fastlane.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/millionaire-fastlane.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -3843,7 +3883,9 @@ return {
       ],
       "needsReview": true,
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 333,
+      "coverHeight": 500
     },
     {
       "id": "ten-times-rule",
@@ -3852,7 +3894,7 @@ return {
       "author": "Grant Cardone",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/ten-times-rule.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/ten-times-rule.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -4026,7 +4068,9 @@ return {
       ],
       "needsReview": true,
       "reviewNote": "Broad thematic overview; edition-specific details and claims need review against your copy.",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1089
     },
     {
       "id": "ego-is-the-enemy",
@@ -4035,7 +4079,7 @@ return {
       "author": "Ryan Holiday",
       "category": "Mindset & habits",
       "status": "to-read",
-      "cover": "../assets/book-covers/ego-is-the-enemy.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/ego-is-the-enemy.jpg?v=20261030supplied",
       "pdf": null,
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -4209,7 +4253,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 736,
+      "coverHeight": 1127
     },
     {
       "id": "richest-man-in-babylon",
@@ -4218,7 +4264,7 @@ return {
       "author": "George S. Clason",
       "category": "Entrepreneurship & wealth",
       "status": "to-read",
-      "cover": "../assets/book-covers/richest-man-in-babylon.svg?v=20261030covers2",
+      "cover": "../assets/book-covers/richest-man-in-babylon.jpg?v=20261030supplied",
       "pdf": "../assets/free-books/richest-man-in-babylon.pdf",
       "pages": null,
       "pagesNote": "Pages vary by edition.",
@@ -4392,7 +4438,9 @@ return {
       ],
       "needsReview": false,
       "reviewNote": "",
-      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises."
+      "contentNote": "Original educational synthesis. Trading examples, routines, and plans are MyTradingJourney adaptations, not quotations or official author exercises.",
+      "coverWidth": 645,
+      "coverHeight": 1000
     }
   ],
   "needsReview": [

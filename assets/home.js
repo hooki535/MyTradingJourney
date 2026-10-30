@@ -13,7 +13,7 @@
   // All values below are fixed, first-party editorial strings, never user content.
   function render(filter='all') {
     const visible=books.filter(b=>filter==='all'||b.category===filter);
-    grid.innerHTML=visible.map(b=>`<article class="book-card"><div class="book-art ${b.color}"><span class="book-category">${b.label}</span><img src="assets/book-covers/${b.id}.svg?v=20261030covers2" alt="${b.title} book cover" width="180" height="260" loading="lazy"></div><div class="book-copy"><small>${b.author}</small><h3>${b.title}</h3><p>${b.summary}</p><button type="button" class="text-link" data-book="${b.id}" aria-label="What you’ll learn from ${b.title}">What you’ll learn <span>↗</span></button></div></article>`).join('');
+    grid.innerHTML=visible.map(b=>`<article class="book-card"><div class="book-art ${b.color}"><img src="assets/book-covers/${window.BookArtwork[b.id].file}" alt="${b.title} book cover" width="${window.BookArtwork[b.id].width}" height="${window.BookArtwork[b.id].height}" loading="lazy"></div><div class="book-copy"><span class="book-category">${b.label}</span><small>${b.author}</small><h3>${b.title}</h3><p>${b.summary}</p><button type="button" class="text-link" data-book="${b.id}" aria-label="What you’ll learn from ${b.title}">What you’ll learn <span>↗</span></button></div></article>`).join('');
     document.getElementById('book-count').textContent=`${visible.length} featured books`;
   }
   document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{
@@ -23,7 +23,7 @@
   grid.addEventListener('click',event=>{
     const button=event.target.closest('[data-book]');if(!button)return;
     const b=books.find(book=>book.id===button.dataset.book);if(!b)return;opener=button;
-    document.getElementById('preview-content').innerHTML=`<div class="preview-book ${b.color}"><img src="assets/book-covers/${b.id}.svg?v=20261030covers2" alt="${b.title} cover" width="150" height="220"></div><div class="preview-text"><p class="eyebrow">${b.label}</p><h2 id="preview-title">${b.title}</h2><p class="preview-author">${b.author}</p><p>${b.summary}</p><h3>What you’ll learn</h3><ul>${b.learn.map(point=>`<li>${point}</li>`).join('')}</ul><div class="apply"><strong>PUT IT INTO PRACTICE</strong><p>${b.action}</p></div><a class="button dark" href="pages/library.html?book=${b.id}">Explore in your library ↗</a><small>Original editorial overview, not a substitute for the book.</small></div>`;
+    document.getElementById('preview-content').innerHTML=`<div class="preview-book ${b.color}"><img src="assets/book-covers/${window.BookArtwork[b.id].file}" alt="${b.title} cover" width="150" height="220"></div><div class="preview-text"><p class="eyebrow">${b.label}</p><h2 id="preview-title">${b.title}</h2><p class="preview-author">${b.author}</p><p>${b.summary}</p><h3>What you’ll learn</h3><ul>${b.learn.map(point=>`<li>${point}</li>`).join('')}</ul><div class="apply"><strong>PUT IT INTO PRACTICE</strong><p>${b.action}</p></div><a class="button dark" href="pages/library.html?book=${b.id}">Explore in your library ↗</a><small>Original editorial overview, not a substitute for the book.</small></div>`;
     dialog.showModal();
   });
   dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
