@@ -2,13 +2,16 @@
 (() => {
   'use strict';
   const L = window.JourneyLibrary;
+  const catalog=L.books.slice(),aliases=new Map();
+  const titleKey=value=>String(value).toLowerCase().replace(/[^a-z0-9]/g,'').replace(/\d+$/,'');
+  const recordKey=id=>aliases.get(id)||id;
   const $ = id => document.getElementById(id);
   const labels = {planned:'To read',reading:'Reading',paused:'Paused',completed:'Finished'};
   let state = L.empty(), selected = null, original = null, draft = '', ready = false, rows = new Map(), user = null;
-  async function reload(){const data=await JourneyAPI.list('book'); rows=new Map(data.map(r=>[r.id.slice(5),r]));state=L.empty();for(const [id,row] of rows){state.records[id]=row.payload;if(!L.books.some(b=>b.id===id)&&row.payload.title)L.books.push({id,title:row.payload.title,author:row.payload.author||'Personal book',group:0,order:L.books.length+1,prompt:'Read, capture a useful idea, and choose one practical action.'});}}
+  async function reload(){const data=await JourneyAPI.list('book'); rows=new Map(data.map(r=>[r.id.slice(5),r]));state=L.empty();aliases.clear();L.books.splice(0,L.books.length,...catalog);for(const [id,row] of rows){state.records[id]=row.payload;if(!catalog.some(b=>b.id===id)&&row.payload.title){const match=catalog.find(b=>titleKey(b.title)===titleKey(row.payload.title));if(match&&!rows.has(match.id)&&row.payload.pdfPath){aliases.set(match.id,id);continue;}L.books.push({id,title:row.payload.title,author:row.payload.author||'Personal book',group:0,order:L.books.length+1,prompt:'Read, capture a useful idea, and choose one practical action.'});}}}
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function message(text, error = false) { $('library-message').textContent = text; $('library-message').className = error ? 'message error' : 'message'; }
-  function value(id) { return {...L.blank(),...state.records[id]}; }
+  function value(id) { return {...L.blank(),...state.records[recordKey(id)]}; }
   function render() {
     const counts = L.books.reduce((a,b) => { a[value(b.id).status]++; return a; }, {planned:0,reading:0,paused:0,completed:0});
     $('reading-stats').innerHTML = [[String(L.books.length),'Books in your path'],[counts.reading,'Currently reading'],[counts.completed,'Books finished'],[L.books.filter(b => value(b.id).action.trim()).length,'Actions recorded']].map(([n,t]) => '<article><span>'+t+'</span><strong>'+n+'</strong></article>').join('');
@@ -24,7 +27,7 @@
     $('library-path-summary').textContent=L.books.length+' books · '+L.groups.length+' areas of growth';
     $('book-grid').innerHTML = matches.map(b => {
       const v = value(b.id);
-      return '<article class="book-card"><div class="book-cover-wrap tone-'+b.group+'"><img class="book-cover" data-cover="'+b.id+'" src="../assets/book-covers/'+(b.cover || 'personal.svg')+'" alt="Book cover for '+esc(b.title)+'" loading="lazy"></div><div class="book-info"><div class="book-meta"><span>'+esc(L.groups[b.group])+'</span><span class="reading-status '+v.status+'">'+labels[v.status]+'</span></div><h3>'+esc(b.title)+'</h3><p class="author">'+esc(b.author)+'</p><p class="book-action">'+esc(v.action || b.prompt)+'</p><div class="book-card-bottom"><span>'+esc(v.pdfPages?v.pdfPages+' PDF pages uploaded':v.chapter || 'Start at your own pace')+'</span><button class="learn-button" data-book="'+b.id+'" aria-label="Open notes for '+esc(b.title)+'">'+(state.records[b.id] ? 'View notes' : 'Start learning')+' ↗</button>'+(L.freeSources[b.id]?'<a class="source-link" href="'+L.freeSources[b.id].url+'" target="_blank" rel="noopener">'+L.freeSources[b.id].title+' ↗</a>':'')+((v.pdfPath||L.freeSources[b.id]?.pdf)?'<a class="learn-button primary" href="reader.html?book='+encodeURIComponent(b.id)+'">Read PDF</a>':'<button class="learn-button" data-book="'+b.id+'">Upload PDF</button>')+'</div></div></article>';
+      return '<article class="book-card"><div class="book-cover-wrap tone-'+b.group+'"><img class="book-cover" data-cover="'+b.id+'" src="../assets/book-covers/'+(b.cover || 'personal.svg')+'" alt="Book cover for '+esc(b.title)+'" loading="lazy"></div><div class="book-info"><div class="book-meta"><span>'+esc(L.groups[b.group])+'</span><span class="reading-status '+v.status+'">'+labels[v.status]+'</span></div><h3>'+esc(b.title)+'</h3><p class="author">'+esc(b.author)+'</p><p class="book-action">'+esc(v.action || b.prompt)+'</p><div class="book-card-bottom"><span>'+esc(v.pdfPages?v.pdfPages+' PDF pages'+(v.pdfExcerpt?' · excerpt':' uploaded'):v.chapter || 'Start at your own pace')+'</span><button class="learn-button" data-book="'+b.id+'" aria-label="Open notes for '+esc(b.title)+'">'+(state.records[recordKey(b.id)] ? 'View notes' : 'Start learning')+' ↗</button>'+(L.freeSources[b.id]?'<a class="source-link" href="'+L.freeSources[b.id].url+'" target="_blank" rel="noopener">'+L.freeSources[b.id].title+' ↗</a>':'')+((v.pdfPath||L.freeSources[b.id]?.pdf)?'<a class="learn-button primary" href="reader.html?book='+encodeURIComponent(recordKey(b.id))+'">Read PDF</a>':'<button class="learn-button" data-book="'+b.id+'">Upload PDF</button>')+'</div></div></article>';
     }).join('') || '<p class="empty-books">No books match these filters. Try another title, category, or status.</p>'; renderCovers();
   }
   async function renderCovers(){for(const img of document.querySelectorAll('[data-cover]')){const path=value(img.dataset.cover).coverPath;if(path){try{const url=await JourneyAPI.asset(path);if(img.isConnected)img.src=url;}catch(_){}}}}
@@ -35,7 +38,7 @@
     const b = L.books.find(b => b.id === id); if (!b) return;
     if (!ready) { message('Sign in to save reading notes and upload your books.',true); JourneyAPI.login('library'); return; }
     try { await reload(); } catch (_) { message('Reading records could not be loaded. Existing data has been kept.',true); return; }
-    selected = id; original = {...value(id)}; $('pdf-file').value='';$('cover-file').value='';$('file-status').textContent=original.pdfPath?'PDF uploaded'+(original.pdfPages?' · '+original.pdfPages+' pages':'')+' · open it using Read PDF.':'Upload a PDF you own or have permission to use (up to 50 MB).';
+    selected = recordKey(id); original = {...value(id)}; $('pdf-file').value='';$('cover-file').value='';$('file-status').textContent=original.pdfPath?'PDF uploaded'+(original.pdfPages?' · '+original.pdfPages+' pages':'')+' · open it using Read PDF.':'Upload a PDF you own or have permission to use (up to 50 MB).';
     $('book-title').textContent = b.title; $('book-author').textContent = b.author; $('book-prompt').textContent = b.prompt;
     for (const field of L.fields) $('book-form').elements.namedItem(field).value = original[field];
     draft = JSON.stringify(formValue()); $('book-error').textContent = ''; $('book-dialog').showModal();
