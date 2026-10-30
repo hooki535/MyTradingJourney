@@ -32,7 +32,7 @@
     ['ego-is-the-enemy','Ego Is the Enemy','Ryan Holiday',0,'Review one decision where protecting your ego distracted you from learning.'],
     ['richest-man-in-babylon','The Richest Man in Babylon','George S. Clason',4,'Write a practical saving rule and review how it fits your income and essential expenses.']
   ];
-  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1,cover:id+'.webp'}));
+  const books = rows.map(([id,title,author,group,prompt],i) => ({id,title,author,group,prompt,order:i+1,cover:id+'.svg?v=20261030covers2'}));
   const key = 'mytradingjourney:library:v1';
   const fields = ['status','chapter','notes','takeaways','question','action','reviewDate','related'];
   const statuses = ['planned','reading','paused','completed'];
