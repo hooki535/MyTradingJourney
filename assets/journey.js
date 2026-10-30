@@ -21,8 +21,8 @@
   if(!section){$('section-title').textContent='Your journey, in one place.';$('section-description').textContent='Practice with purpose. Build a record of what you learn.';home();return;}
   $('section-title').textContent=section.title;$('section-description').textContent=section.description;
   const search=$('record-search').value.toLowerCase();const rows=all.filter(r=>r.kind===kind&&JSON.stringify(r.payload).toLowerCase().includes(search));
-  let motivation=kind==='mindset'?'<section class="journey-hero"><div><p class="eyebrow">A REMINDER FOR TODAY</p><h2>My journal is evidence, not a highlight reel.</h2><p>Original MyTradingJourney reflection. Choose an intention, attach an image of your goal, and give it a practical next step.</p></div></section>':'';
-  $('journey-content').innerHTML=motivation+'<div class="journey-grid">'+(rows.map(r=>card(r)).join('')||'<div class="journey-empty">'+(user?'No entries here yet. Start with one clear observation.':'Sign in to open your private entries and add your first one.')+'</div>')+'</div>';
+  const motivation=window.JourneyDesign?.section(kind,all.filter(r=>r.kind===kind))||'';
+  $('journey-content').innerHTML=motivation+'<div class="journey-grid">'+(rows.map(r=>card(r)).join('')||(window.JourneyDesign?(search?'<div class="journey-empty">No entries match your search.</div>':''):'<div class="journey-empty">'+(user?'No entries here yet. Start with one clear observation.':'Sign in to open your private entries and add your first one.')+'</div>'))+'</div>';
   loadImages();
  }
  function card(r){const p=r.payload;const result=r.kind==='journal'?net(p):null;const rr=result!==null&&Number(p.risk)>0?result/Number(p.risk):null;
@@ -40,7 +40,7 @@
  await A.save(editing?.id||kind+':'+crypto.randomUUID(),kind,p,editing?.revision??null);for(const file of oldFiles)if(!existing.some(f=>f.path===file.path))A.dropFile(file.path).catch(()=>{});$('record-dialog').close();await refresh();draw();message('Saved privately to your account.');}
  catch(err){for(const path of uploaded)A.dropFile(path).catch(()=>{});$('record-error').textContent=err.message;}finally{busy=false;e.submitter.disabled=false;}};
  $('journey-content').onclick=async e=>{const edit=e.target.closest('[data-edit]'),del=e.target.closest('[data-delete]'),image=e.target.closest('[data-open-image]');if(edit)open(all.find(r=>r.id===edit.dataset.edit));if(image){e.preventDefault();try{const r=all.find(r=>r.id===image.dataset.openImage);const url=await A.asset(r.payload.files[Number(image.dataset.fileIndex)].path);const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.click();}catch(err){message(err.message,true);}}if(del){const row=all.find(r=>r.id===del.dataset.delete);if(!confirm('Delete this entry and its private attachments?'))return;try{await A.remove(row);for(const f of row.payload.files||[])A.dropFile(f.path).catch(()=>{});await refresh();draw();message('Entry deleted.');}catch(err){message(err.message,true);}}};
- function route(){kind=location.hash.slice(1);if(!schemas[kind])kind='home';$('record-search').value='';draw();}
+ function route(){kind=location.hash.slice(1);if(!schemas[kind])kind='home';document.body.dataset.section=kind;$('record-search').value='';draw();window.scrollTo({top:0,behavior:'instant'});}
  window.addEventListener('hashchange',route);window.addEventListener('beforeunload',e=>{if(busy||($('record-dialog').open&&dirty())){e.preventDefault();e.returnValue='';}});
  A.ready.then(async u=>{user=u;if(u){await refresh();message('Private account workspace · records save to the database.');}else message('Sign in to save your records and access them on another device.');route();}).catch(err=>{message('Could not load your account: '+err.message,true);route();});
 })();
