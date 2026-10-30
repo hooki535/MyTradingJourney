@@ -1,7 +1,7 @@
 /* One navigation for every section, including the existing replay workspace. */
 (() => {
   const page=document.body.dataset.page, replay=page==='backtesting';
-  const nav=[['journey.html#home','Overview','home'],['backtesting.html#sessions','Backtesting Lab','backtesting'],['backtesting.html#strategies','Strategies','strategies'],['backtesting.html#analytics/all','Analytics','analytics'],['journey.html#journal','Trade Journal','journal'],['library.html','Learning Library','library'],['journey.html#mindset','Mindset & Vision','mindset'],['journey.html#builder','Builder’s Desk','builder'],['journey.html#document','Document Vault','document'],['journey.html#review','Weekly Reviews','review']];
+  const nav=[['../index.html','Home','landing'],['journey.html#home','Overview','home'],['backtesting.html#sessions','Backtesting Lab','backtesting'],['backtesting.html#strategies','Strategies','strategies'],['backtesting.html#analytics/all','Analytics','analytics'],['journey.html#journal','Trade Journal','journal'],['library.html','Learning Library','library'],['journey.html#mindset','Mindset & Vision','mindset'],['journey.html#builder','Builder’s Desk','builder'],['journey.html#document','Document Vault','document'],['journey.html#review','Weekly Reviews','review']];
   const icon='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>';
   const sidebar=document.querySelector('.bt-sidebar,.learn-sidebar,.journey-sidebar');if(!sidebar)return;
   const oldBottom=sidebar.querySelector('.bt-side-bottom');
