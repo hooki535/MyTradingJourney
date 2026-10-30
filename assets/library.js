@@ -28,7 +28,7 @@
     $('book-grid').innerHTML = matches.map(b => {
       const v = value(b.id);
       return '<article class="book-card"><div class="book-cover-wrap tone-'+b.group+'"><img class="book-cover" data-cover="'+b.id+'" src="../assets/book-covers/'+(b.cover || 'personal.svg')+'" alt="Book cover for '+esc(b.title)+'" loading="lazy"></div><div class="book-info"><div class="book-meta"><span>'+esc(L.groups[b.group])+'</span><span class="reading-status '+v.status+'">'+labels[v.status]+'</span></div><h3>'+esc(b.title)+'</h3><p class="author">'+esc(b.author)+'</p><p class="book-action">'+esc(v.action || b.prompt)+'</p><div class="book-card-bottom"><span>'+esc(v.pdfPages?v.pdfPages+' PDF pages'+(v.pdfExcerpt?' · excerpt':' uploaded'):v.chapter || 'Start at your own pace')+'</span><button class="learn-button" data-book="'+b.id+'" aria-label="Open notes for '+esc(b.title)+'">'+(state.records[recordKey(b.id)] ? 'View notes' : 'Start learning')+' ↗</button>'+(L.freeSources[b.id]?'<a class="source-link" href="'+L.freeSources[b.id].url+'" target="_blank" rel="noopener">'+L.freeSources[b.id].title+' ↗</a>':'')+((v.pdfPath||L.freeSources[b.id]?.pdf)?'<a class="learn-button primary" href="reader.html?book='+encodeURIComponent(recordKey(b.id))+'">Read PDF</a>':'<button class="learn-button" data-book="'+b.id+'">Upload PDF</button>')+'</div></div></article>';
-    }).join('') || '<p class="empty-books">No books match these filters. Try another title, category, or status.</p>'; renderCovers();
+    }).join('') || '<p class="empty-books">No books match these filters. Try another title, category, or status.</p>'; renderCovers();if(window.dispatchEvent&&typeof CustomEvent!=='undefined')window.dispatchEvent(new CustomEvent('mtj:library-render'));
   }
   async function renderCovers(){for(const img of document.querySelectorAll('[data-cover]')){const path=value(img.dataset.cover).coverPath;if(path){try{const url=await JourneyAPI.asset(path);if(img.isConnected)img.src=url;}catch(_){}}}}
   function formValue() { return Object.fromEntries(L.fields.map(k => [k,$('book-form').elements.namedItem(k).value])); }
@@ -69,7 +69,7 @@
   $('add-book').onclick=()=>{if(!ready){JourneyAPI.login('library');return;}$('new-book-dialog').showModal();};
   $('new-book-form').onsubmit=async e=>{e.preventDefault();const f=e.target;try{const id='custom-'+crypto.randomUUID();await JourneyAPI.save('book:'+id,'book',{...L.blank(),title:f.elements.title.value.trim(),author:f.elements.author.value.trim()});await reload();render();$('new-book-dialog').close();f.reset();open(id);}catch(err){$('new-book-error').textContent=err.message;}};
   window.addEventListener('beforeunload',e => { if ($('book-dialog').open && dirty()) { e.preventDefault(); e.returnValue = ''; } });
-  window.JourneyLibraryUI={reload:async()=>{await reload();render();},message};
+  window.JourneyLibraryUI={reload:async()=>{await reload();render();},message,openNotes:open,getBooks:()=>L.books.slice(),value,recordKey,isReady:()=>ready};
   JourneyAPI.ready.then(async u=>{user=u;if(!u){message('Browse the reading path. Sign in to save notes, add books, or read your private PDFs.');return;}await reload();ready=true;render();message('Connected · reading records save directly to your account.');}).catch(err=>message('Account unavailable: '+err.message,true));
   render();
 })();
