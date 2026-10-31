@@ -62,3 +62,14 @@ The staged account connection is available at `pages/login.html?connect=new`. Th
 Next required handoff: the user signs into the staged connection using their Google test account. The new project was checked before this handoff: zero Auth users and zero journey records. Real OAuth callback and destination identity mapping remain unverified until that sign-in completes.
 
 The live application remains connected to the source project; no accounts, records or private files have been migrated yet. Database-only creation and Auth URL configuration do not constitute a completed cutover.
+
+
+## Staged self-service transfer
+
+`assets/workspace-transfer.js` adds a review-and-copy flow after the destination connection is verified. The source client explicitly disables callback URL detection, so it cannot consume destination OAuth tokens. It uses the existing source session and independently validates each account using Auth `getUser`.
+
+The review lists both account emails and counts before the user starts copying. Queries filter by authenticated owner; private files are listed only under that owner's prefix. It copies workspace records and only replay-related `user_data` keys, including remapping the owner suffix of the account replay key. TheOnePercent academy, trade, and profile keys are excluded.
+
+Copies never overwrite destination records or files. Existing conflicts stop the process. File bytes are checked with SHA-256 after upload, including duplicate-file retries. Attachment owner paths are remapped only when the referenced source file exists. Source snapshots are rechecked before and after the copy. A transfer report is offered only after verification. Partial copies are retained for retry; source data is never deleted.
+
+Remaining limits: this does not transfer browser-only Book Hub progress, local IndexedDB PDFs/annotations, or provision market-history services. It does not switch the website backend. Authentication and real storage/RLS transfer still require the user's sign-in; automated tests use isolated fake clients.
