@@ -40,6 +40,20 @@ A new database does not automatically move authentication users, OAuth configura
 9. Verify email login, Google login, confirmation and recovery, account isolation, uploads, replay, book progress, note autosave and sign-out on a second device.
 10. Publish the verified cutover, then retain the old project as a recovery source until the user has confirmed the migrated records.
 
+## Authentication configuration completed
+
+Dashboard access was verified for `hooki535` in `hooki535's Org`.
+
+- Site URL saved and verified: `https://hooki535.github.io/MyTradingJourney/`.
+- Redirect allowlist saved and verified (two entries):
+  - `https://hooki535.github.io/MyTradingJourney/pages/login.html**`
+  - `https://hooki535.github.io/MyTradingJourney/pages/reset-password.html**`
+- Email provider enabled; email confirmation remains required.
+- Google provider is still disabled and its Client ID / Client Secret fields are not configured.
+- Google callback shown by the dashboard: `https://lazdabmppsznsoaoufkj.supabase.co/auth/v1/callback`.
+
 ## Current blocker
 
-The connected Supabase tools can provision projects and schema but do not expose Authentication URL/provider configuration. The dashboard opened at the new project requires sign-in in the controlled browser. No user credentials have been entered or requested through chat.
+Google OAuth application credentials must be configured directly in the provider dashboard. The application password is not an OAuth client secret. Secret values must not be placed in chat, repository files, screenshots, or migration notes. A dashboard handoff is needed for this step.
+
+The live application remains connected to the source project; no accounts, records or private files have been migrated yet. Database-only creation and Auth URL configuration do not constitute a completed cutover.
