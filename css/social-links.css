@@ -1,0 +1,14 @@
+/* Personal links use text labels and explicit focus states in both site themes. */
+.mj-social-heading{font-size:11px;font-weight:600;letter-spacing:.08em;margin:22px 0 12px}
+.mj-social-links{display:flex;flex-wrap:wrap;gap:8px}
+.mj-social-links a{box-sizing:border-box;display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 12px;margin:0!important;border:1px solid currentColor;border-radius:6px;color:inherit!important;font:inherit;font-size:12px;text-decoration:none!important;line-height:1.3}
+.mj-social-links svg{width:17px;height:17px;flex:none}
+.mj-social-links a>span:last-child{font-size:12px;opacity:.8}
+.mj-social-links a:hover{text-decoration:underline!important;text-underline-offset:4px}
+.mj-social-links a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.mj-sidebar-connect{color:var(--mj-ink);padding:0 8px 24px}
+.mj-sidebar-connect .mj-social-heading{font-size:10px}
+.mj-sidebar-connect .mj-social-links{display:grid;grid-template-columns:1fr}
+.mj-sidebar-connect .mj-social-links a{justify-content:flex-start;font-size:11px}
+.mj-sidebar-connect .mj-social-links a>span:last-child{margin-left:auto}
+@media print{.mj-social-links,.mj-social-heading{display:none!important}}
