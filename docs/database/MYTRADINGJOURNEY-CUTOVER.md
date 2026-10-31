@@ -49,11 +49,16 @@ Dashboard access was verified for `hooki535` in `hooki535's Org`.
   - `https://hooki535.github.io/MyTradingJourney/pages/login.html**`
   - `https://hooki535.github.io/MyTradingJourney/pages/reset-password.html**`
 - Email provider enabled; email confirmation remains required.
-- Google provider is still disabled and its Client ID / Client Secret fields are not configured.
+- Google provider enabled, verified through the public Auth settings endpoint. Email provider also verified enabled.
+- User supplied a Google Audience screenshot showing their test account added. OAuth remains in Testing.
 - Google callback shown by the dashboard: `https://lazdabmppsznsoaoufkj.supabase.co/auth/v1/callback`.
 
 ## Current blocker
 
-Google OAuth application credentials must be configured directly in the provider dashboard. The application password is not an OAuth client secret. Secret values must not be placed in chat, repository files, screenshots, or migration notes. A dashboard handoff is needed for this step.
+Google OAuth provider setup is complete. The user reported rotating the disclosed OAuth secret; secret values were not copied into source files or migration notes.
+
+The staged account connection is available at `pages/login.html?connect=new`. This mode initializes only the destination Auth client, uses the separate `mtj.workspace.auth.v1` session key, preserves the destination flag through OAuth/confirmation/recovery callbacks, verifies the user with Auth and an owner-filtered database read, and stops at a connection confirmation. It does not open the source workspace with a destination session. The normal login route and all workspace records still use the source project.
+
+Next required handoff: the user signs into the staged connection using their Google test account. The new project was checked before this handoff: zero Auth users and zero journey records. Real OAuth callback and destination identity mapping remain unverified until that sign-in completes.
 
 The live application remains connected to the source project; no accounts, records or private files have been migrated yet. Database-only creation and Auth URL configuration do not constitute a completed cutover.

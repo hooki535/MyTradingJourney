@@ -1,4 +1,12 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+test('source client never initializes on destination login or recovery callbacks',()=>{
+ for(const page of ['login','reset-password']){
+  let initialized=false;
+  const context={window:{supabase:{createClient(){initialized=true;throw Error('Source client consumed destination callback');}}},location:{pathname:'/MyTradingJourney/pages/'+page+'.html',search:'?connect=new'},URLSearchParams};
+  vm.runInNewContext(fs.readFileSync(__dirname+'/../assets/journey-api.js','utf8'),context);
+  assert.equal(initialized,false);assert.equal(context.window.JourneyAPI,undefined);
+ }
+});
 function setup({user={id:'owner-a'},result={data:{id:'book:one',revision:2},error:null}}={}){
  const calls=[];const query={select(){calls.push(['select']);return this;},eq(k,v){calls.push(['eq',k,v]);return this;},order(){return this;},insert(v){calls.push(['insert',v]);return this;},update(v){calls.push(['update',v]);return this;},delete(){return this;},maybeSingle(){return Promise.resolve(result);},then(resolve,reject){return Promise.resolve(result).then(resolve,reject);}};
  const bucket={upload:async(...args)=>{calls.push(['upload',...args]);return {error:null};},createSignedUrl:async()=>({data:{signedUrl:'https://example.test/private'},error:null}),remove:async()=>({error:null})};

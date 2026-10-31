@@ -50,3 +50,32 @@ test('only a verified OAuth or email-confirmation callback can complete automati
  const rejected=loginPage({hash:'#access_token=fixture-only'});await A.mount(rejected.doc,rejected.win);assert.deepEqual(rejected.redirects,[]);
  const failed=loginPage({user:{id:'remembered-user'},search:'?code=fixture-only&error=invalid'});await A.mount(failed.doc,failed.win);assert.deepEqual(failed.redirects,[]);
 });
+test('destination callbacks keep connection mode for Google, confirmation and recovery',()=>{
+ const href='https://hooki535.github.io/MyTradingJourney/pages/login.html?connect=new';
+ for(const reset of [false,true]){
+  const url=new URL(A.callbackURL(href,{page:'journey',hash:'#home'},reset));
+  assert.equal(url.searchParams.get('connect'),'new');
+  assert.equal(url.pathname,'/MyTradingJourney/pages/'+(reset?'reset-password':'login')+'.html');
+ }
+});
+function connectionPage({databaseError=null,user={id:'destination-user',email:'member@example.com'}}={}){
+ const p=loginPage({search:'?connect=new',user:{id:'source-user'}}),calls=[];
+ const auth={...p.auth,async getUser(){calls.push('verified-user');return {data:{user},error:null};}};
+ const client={auth,from(table){calls.push(['table',table]);return {select(...args){calls.push(['select',...args]);return this;},async eq(key,value){calls.push(['owner',key,value]);return {count:0,error:databaseError};}};}};
+ p.win.supabase={createClient(url,key,options){calls.push(['client',url,options]);assert.ok(key.startsWith('sb_publishable_'));return client;}};
+ return {...p,calls,auth};
+}
+test('new connection uses isolated destination auth and verifies owner access without entering the source workspace',async()=>{
+ const p=connectionPage();await A.mount(p.doc,p.win);
+ assert.deepEqual(p.redirects,[]);
+ assert.ok(p.calls.some(c=>Array.isArray(c)&&c[0]==='client'&&c[1]==='https://lazdabmppsznsoaoufkj.supabase.co'&&c[2].auth.storageKey==='mtj.workspace.auth.v1'));
+ assert.ok(p.calls.some(c=>Array.isArray(c)&&c[0]==='owner'&&c[1]==='user_id'&&c[2]==='destination-user'));
+ assert.equal(p.nodes.get('auth-form').hidden,true);
+ assert.match(p.nodes.get('access-title').textContent,/connected/);
+});
+test('database failure never reports a completed connection',async()=>{
+ const p=connectionPage({databaseError:{message:'permission denied'}});await A.mount(p.doc,p.win);
+ assert.notEqual(p.nodes.get('auth-form').hidden,true);
+ assert.match(p.nodes.get('access-feedback').textContent,/unavailable/);
+ assert.deepEqual(p.redirects,[]);
+});

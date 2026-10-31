@@ -1,6 +1,8 @@
 /* Database is the source of truth. Only Supabase sign-in tokens use browser persistence. */
 (() => {
   'use strict';
+  // The staged connection check must never consume a new-project OAuth callback in the source client.
+  if (/\/pages\/(?:login|reset-password)\.html$/.test(location.pathname || '') && new URLSearchParams(location.search || '').get('connect') === 'new') return;
   const client = window.supabase.createClient('https://ecnxstqfnjaiibwiwwto.supabase.co','sb_publishable_vqHYZ_AasII7F611BTDWdg_Nftd7dCb');
   let user = null;
   const workspaceStorage={data:new Map(),onChange:null,getItem(k){return this.data.get(k)??null;},setItem(k,v){this.data.set(k,String(v));if((k.startsWith('onepercent:backtest-')||k==='onepercent:drawing-templates:v1'))this.onChange?.();},removeItem(k){this.data.delete(k);if((k.startsWith('onepercent:backtest-')||k==='onepercent:drawing-templates:v1'))this.onChange?.();}};
