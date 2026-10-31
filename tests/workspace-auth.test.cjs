@@ -29,3 +29,24 @@ test('account modes call the intended auth operation without storing credentials
  assert.deepEqual(calls[3],['updateUser',{password:'sample-password'}]);
 });
 test('network, rate-limit and invalid-session errors remain actionable without exposing raw backend text',()=>{assert.match(A.message({status:429}),/wait/i);assert.match(A.message({message:'Failed to fetch'}),/connection/);assert.match(A.message({message:'Invalid login credentials'}),/email and password/);assert.match(A.message({message:'expired token'}),/new reset email/);});
+
+function loginPage({user=null,search='?next=journey',hash=''}={}){
+ const nodes=new Map(),redirects=[];
+ function element(){return {dataset:{},value:'',type:'password',hidden:false,disabled:false,attributes:{},events:{},setAttribute(k,v){this.attributes[k]=v;},addEventListener(k,fn){this.events[k]=fn;},replaceChildren(){},append(){},focus(){}};}
+ const doc={body:{dataset:{authMode:'login'}},getElementById(id){if(!nodes.has(id))nodes.set(id,element());return nodes.get(id);},createElement:element,createTextNode:text=>({textContent:text})};
+ const auth={onAuthStateChange(){},async signInWithPassword(){return {data:{session:{user:{id:'verified-user'}}},error:null};}};
+ const win={location:{search,hash,href:'https://hooki535.github.io/MyTradingJourney/pages/login.html'+search+hash,replace:url=>redirects.push(url)},sessionStorage:{getItem:()=>null,removeItem(){},setItem(){}},JourneyAPI:{client:{auth},ready:Promise.resolve(user)}};
+ return {doc,win,nodes,redirects,auth};
+}
+test('a remembered session no longer bypasses the sign-in form on a normal Access visit',async()=>{
+ const p=loginPage({user:{id:'remembered-user'}});await A.mount(p.doc,p.win);
+ assert.deepEqual(p.redirects,[]);assert.equal(p.nodes.get('access-submit').disabled,false);assert.equal(p.nodes.get('access-social').hidden,false);
+ p.nodes.get('access-email').value='sample@example.com';p.nodes.get('access-password').value='sample-password';
+ await p.nodes.get('auth-form').events.submit({preventDefault(){}});
+ assert.deepEqual(p.redirects,['journey.html#home']);
+});
+test('only a verified OAuth or email-confirmation callback can complete automatic entry',async()=>{
+ const accepted=loginPage({user:{id:'verified-user'},hash:'#access_token=fixture-only'});await A.mount(accepted.doc,accepted.win);assert.deepEqual(accepted.redirects,['journey.html#home']);
+ const rejected=loginPage({hash:'#access_token=fixture-only'});await A.mount(rejected.doc,rejected.win);assert.deepEqual(rejected.redirects,[]);
+ const failed=loginPage({user:{id:'remembered-user'},search:'?code=fixture-only&error=invalid'});await A.mount(failed.doc,failed.win);assert.deepEqual(failed.redirects,[]);
+});

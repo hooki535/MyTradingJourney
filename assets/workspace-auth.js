@@ -25,6 +25,7 @@
   let stored=null;try{stored=win.sessionStorage.getItem('op-return');}catch(_){}
   const route=returnRoute(win.location.search,stored),destination=route.page+'.html'+route.hash;
   const callbackError=hash.get('error')||params.get('error');
+  const authCallback=params.has('code')||hash.has('access_token');
   const copy={login:['YOUR PERSONAL WORKSPACE','Welcome back.','Keep becoming.','A place for your practice, your learning, and the life you’re building.','Sign in to my workspace','New to MyTradingJourney?','Create an account ↗'],signup:['YOUR NEXT CHAPTER','Start your journey.','Make it your own.','Create a personal workspace for your chart studies, reading, ideas, and reflections.','Create my account','Already have an account?','Sign in instead ↗'],forgot:['A FRESH START','Let’s get you','back on track.','Enter your account email and we’ll send you a password reset link.','Send reset link','Remember your password?','Back to sign in ↗'],reset:['A FRESH START','Your next chapter.','A new password.','Choose a new password to continue with your personal workspace.','Save new password','Need another reset link?','Request a new link ↗']};
   function feedback(text,error=false){const el=$('access-feedback');el.textContent=text;el.hidden=!text;el.dataset.error=String(error);el.setAttribute('role',error?'alert':'status');}
   function fieldErrors(errors){for(const name of ['email','password','confirm']){$('access-'+name+'-error').textContent=errors[name]||'';$('access-'+name).setAttribute('aria-invalid',String(Boolean(errors[name])));}}
@@ -45,17 +46,17 @@
     else feedback('We couldn’t confirm your session. Please try signing in again.',true);
    }catch(error){feedback(message(error),true);}finally{busy=false;enable();}
   });
-  $('access-google').addEventListener('click',async()=>{if(busy||!connected)return;feedback('');busy=true;enable();try{try{win.sessionStorage.setItem('op-return',JSON.stringify({...route,at:Date.now()}));}catch(_){}const result=await auth.signInWithOAuth({provider:'google',options:{redirectTo:callbackURL(win.location.href,route)}});if(result.error)throw result.error;}catch(_){feedback('Google sign-in isn’t available right now. You can use your email and password instead.',true);}finally{busy=false;enable();}});
+  $('access-google').addEventListener('click',async()=>{if(busy||!connected)return;feedback('');busy=true;enable();try{try{win.sessionStorage.setItem('op-return',JSON.stringify({...route,at:Date.now()}));}catch(_){}const result=await auth.signInWithOAuth({provider:'google',options:{redirectTo:callbackURL(win.location.href,route),queryParams:{prompt:'select_account'}}});if(result.error)throw result.error;}catch(_){feedback('Google sign-in isn’t available right now. You can use your email and password instead.',true);}finally{busy=false;enable();}});
   setMode(mode);
   async function initialize(){try{const api=win.JourneyAPI;if(!api?.client?.auth)throw Error('connection');auth=api.client.auth;
    auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'&&session?.user){recoveryAllowed=true;setMode('reset');}});
    const user=await api.ready;connected=true;
    if(recoveryIntent){recoveryAllowed=Boolean(user)&&!callbackError;setMode('reset');}
-   else if(user&&!callbackError){enter();return;}
+   else if(user&&authCallback&&!callbackError){enter();return;}
    if(callbackError)feedback('That sign-in link is invalid or expired. Try signing in again or request a new reset link.',true);
    enable();
   }catch(_){connected=false;enable();feedback('The account connection is unavailable. Reload this page to try again.',true);}}
-  initialize();
+  return initialize();
  }
  return {returnRoute,callbackURL,validate,message,request,mount};
 });
