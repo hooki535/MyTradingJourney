@@ -7,7 +7,7 @@
   const recordKey=id=>aliases.get(id)||id;
   const $ = id => document.getElementById(id);
   const labels = {planned:'To read',reading:'Reading',paused:'Paused',completed:'Finished'};
-  let state = L.empty(), selected = null, original = null, draft = '', ready = false, rows = new Map(), user = null;
+  let state = L.empty(), selected = null, original = null, draft = '', ready = false, rows = new Map(), user = null, accountDraft=null, opening=false, saving=false, newBookDraft=null, newBookOpening=false;
   async function reload(){const data=await JourneyAPI.list('book'); rows=new Map(data.map(r=>[r.id.slice(5),r]));state=L.empty();aliases.clear();L.books.splice(0,L.books.length,...catalog);for(const [id,row] of rows){if(row.payload.libraryArchived===true)continue;state.records[id]=row.payload;if(!catalog.some(b=>b.id===id)&&row.payload.title){const match=catalog.find(b=>titleKey(b.title)===titleKey(row.payload.title));if(match&&!rows.has(match.id)&&row.payload.pdfPath){aliases.set(match.id,id);continue;}L.books.push({id,title:row.payload.title,author:row.payload.author||'Personal book',group:0,order:L.books.length+1,prompt:'Read, capture a useful idea, and choose one practical action.'});}}}
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function message(text, error = false) { $('library-message').textContent = text; $('library-message').className = error ? 'message error' : 'message'; }
@@ -33,7 +33,7 @@
   async function renderCovers(){for(const img of document.querySelectorAll('[data-cover]')){const path=value(img.dataset.cover).coverPath;if(path&&!catalog.some(b=>b.id===img.dataset.cover)){try{const url=await JourneyAPI.asset(path);if(img.isConnected)img.src=url;}catch(_){}}}}
   function formValue() { return Object.fromEntries(L.fields.map(k => [k,$('book-form').elements.namedItem(k).value])); }
   function dirty() { return JSON.stringify(formValue()) !== draft || !!$('pdf-file')?.files.length || !!$('cover-file')?.files.length; }
-  function close() { if (!dirty() || window.confirm('Discard your unsaved reading notes?')) $('book-dialog').close(); }
+  async function close(){if(opening||saving)return;try{if(accountDraft)await accountDraft.flush();$('book-dialog').close();}catch(err){$('book-error').textContent=err.message+' Your draft stays open.';}}
   async function open(id) {
     const b = L.books.find(b => b.id === id); if (!b) return;
     if (!ready) { message('Sign in to save account reading notes.',true); JourneyAPI.login('library'); return; }
@@ -41,34 +41,39 @@
     selected = recordKey(id); original = {...value(id)}; $('pdf-file').value='';$('cover-file').value='';$('file-status').textContent=original.pdfPath?'PDF uploaded'+(original.pdfPages?' · '+original.pdfPages+' pages':'')+' · open it using Read PDF.':'PDF unavailable. The Book Hub guide is ready to explore.';
     const coverControl=$('cover-file').closest?.('label');if(coverControl)coverControl.hidden=!!b.cover; $('book-title').textContent = b.title; $('book-author').textContent = b.author; $('book-prompt').textContent = b.prompt;
     for (const field of L.fields) $('book-form').elements.namedItem(field).value = original[field];
-    draft = JSON.stringify(formValue()); $('book-error').textContent = ''; $('book-dialog').showModal();
+    draft = JSON.stringify(formValue()); $('book-dialog').showModal();opening=true;accountDraft=null;document.querySelector('.book-fields').inert=true;try{accountDraft=window.MTJAccountDrafts.create({api:JourneyAPI,user,key:'book-notes:'+selected,initial:{entryId:'book:'+selected,baseRevision:rows.get(selected)?.revision??null},collect:formValue,restore:values=>{for(const field of L.fields)if(values[field]!==undefined)$('book-form').elements.namedItem(field).value=values[field];},onStatus:(_,text)=>{$('book-error').textContent=text;}});await accountDraft.load();for(const [id,field] of [['pdf-file','pdfPath'],['cover-file','coverPath']])$(id).onchange=async()=>{const files=[...$(id).files];$(id).value='';try{await accountDraft.stage(files,field);}catch(err){$('book-error').textContent=err.message;}};}catch(err){accountDraft=null;$('book-error').textContent='Draft unavailable: '+err.message+' Close and reopen to retry.';}finally{opening=false;document.querySelector('.book-fields').inert=!accountDraft;}
   }
+  $('book-form').addEventListener('input',()=>accountDraft?.changed());
+  window.MTJSaveGate?.register('book-draft',async()=>{if(saving||opening||newBookOpening)throw Error('Wait for your book save to finish.');if(newBookDraft)await newBookDraft.flush();if($('book-dialog').open){if(!accountDraft)throw Error('Your book draft is not connected.');await accountDraft.flush();}});
   for (const b of L.groups) { const option = document.createElement('option'); option.value = String(L.groups.indexOf(b)); option.textContent = b; $('book-category').append(option); }
   for (const id of ['book-search','book-category','book-status']) $(id).addEventListener(id === 'book-search' ? 'input' : 'change', render);
   for (const id of ['reading-focus','book-grid']) $(id).addEventListener('click', e => { const button = e.target.closest('[data-book]'); if (button) open(button.dataset.book); });
+  $('download-book-draft').onclick=()=>{try{window.MTJAccountDrafts.download(document,accountDraft,'MyTradingJourney-book-draft.json');}catch(err){$('book-error').textContent=err.message;}};
+  $('reload-book-entry').onclick=async()=>{if(saving||opening||!accountDraft||!confirm('Download your draft first if you want to keep it. Discard this draft and reload the saved book notes?'))return;try{const id=L.books.find(b=>recordKey(b.id)===selected)?.id||selected;await accountDraft.flush();await accountDraft.clear();accountDraft=null;$('book-dialog').close();await reload();render();await open(id);}catch(err){$('book-error').textContent=err.message;}};
   $('close-book').addEventListener('click',close); $('cancel-book').addEventListener('click',close);
   $('book-dialog').addEventListener('cancel',e => { e.preventDefault(); close(); });
   $('book-form').addEventListener('submit',async e => {
-    e.preventDefault(); const button=e.submitter; if(button)button.disabled=true;
+    e.preventDefault();if(saving||opening||!accountDraft)return;saving=true;document.querySelector('.book-fields').inert=true; const button=e.submitter; if(button)button.disabled=true;
     const uploaded=[];
     try {
-      const payload={...value(selected),...L.record(formValue())};
+      await accountDraft.flush();const payload={...value(selected),...L.record(formValue())};for(const file of accountDraft.files)if(['pdfPath','coverPath'].includes(file.field))payload[file.field]=file.path;
       for(const [input,field] of [['pdf-file','pdfPath'],['cover-file','coverPath']]){const file=$(input).files[0];if(file){const path=await JourneyAPI.upload(file);uploaded.push(path);payload[field]=path;}}
-      const row=await JourneyAPI.save('book:'+selected,'book',payload,rows.get(selected)?.revision??null);
+      const row=await JourneyAPI.save(accountDraft.entryId,'book',payload,accountDraft.baseRevision);
       rows.set(selected,row);state.records[selected]=payload;
-      $('book-dialog').close(); render(); message('Reading notes and files saved to your account.');
+      await accountDraft.clear();accountDraft=null;$('book-dialog').close(); render(); message('Reading notes and files saved to your account.');
       for(const field of ['pdfPath','coverPath'])if(original[field]&&original[field]!==payload[field])JourneyAPI.dropFile(original[field]).catch(()=>{});
     } catch(err){for(const path of uploaded)JourneyAPI.dropFile(path).catch(()=>{});$('book-error').textContent=err.message||'Could not save. Your draft is still here.';}
-    finally{if(button)button.disabled=false;}
+    finally{saving=false;if(button)button.disabled=false;document.querySelector('.book-fields').inert=!accountDraft;}
   });
   function download(body){const url=URL.createObjectURL(new Blob([JSON.stringify(body,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='MyTradingJourney-Reading-Backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
   $('export-library').addEventListener('click',async()=>{try{await reload();download({kind:'mytradingjourney-cloud-books',version:1,records:[...rows.values()].map(r=>({id:r.id,payload:r.payload}))});message('Notes exported. Private PDF and cover files remain in your account.');}catch(err){message(err.message,true);}});
   async function importOld(data){const incoming=L.validate(data);await reload();if(!confirm('Import '+Object.keys(incoming.records).length+' book records into your account? Matching reading notes will be replaced.'))return;for(const [id,record] of Object.entries(incoming.records)){await JourneyAPI.save('book:'+id,'book',{...value(id),...record},rows.get(id)?.revision??null);}await reload();render();message('Reading notes imported to your account.');}
   $('import-library').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>4000000)throw Error('Choose a backup below 4 MB.');const data=JSON.parse(await file.text());if(data.kind==='mytradingjourney-library')await importOld(data);else{if(data.kind!=='mytradingjourney-cloud-books'||data.version!==1||!Array.isArray(data.records))throw Error('Choose a reading backup.');for(const r of data.records){if(!/^book:(?:[a-z0-9-]+)$/.test(r.id))throw Error('Invalid book identifier.');L.record(r.payload);}await reload();if(confirm('Restore these reading records to your account? Matching records will be replaced.')){for(const r of data.records){await JourneyAPI.save(r.id,'book',r.payload,rows.get(r.id.slice(5))?.revision??null);}await reload();render();message('Reading notes restored.');}}}catch(err){message('Import stopped: '+err.message+' Successfully imported records are kept; retry remaining records as needed.',true);}finally{e.target.value='';}});
   $('import-browser').onclick=async()=>{try{const raw=localStorage.getItem(L.key);if(!raw)throw Error('No older reading notes were found in this browser.');await importOld(JSON.parse(raw));}catch(err){message(err.message,true);}};
-  $('add-book').onclick=()=>{if(!ready){JourneyAPI.login('library');return;}$('new-book-dialog').showModal();};
-  $('new-book-form').onsubmit=async e=>{e.preventDefault();const f=e.target;try{const id='custom-'+crypto.randomUUID();await JourneyAPI.save('book:'+id,'book',{...L.blank(),title:f.elements.title.value.trim(),author:f.elements.author.value.trim()});await reload();render();$('new-book-dialog').close();f.reset();open(id);}catch(err){$('new-book-error').textContent=err.message;}};
-  window.addEventListener('beforeunload',e => { if ($('book-dialog').open && dirty()) { e.preventDefault(); e.returnValue = ''; } });
+  $('add-book').onclick=async()=>{if(!ready){JourneyAPI.login('library');return;}if(newBookOpening||saving)return;newBookOpening=true;$('new-book-dialog').showModal();const form=$('new-book-form');form.querySelector('.book-fields').inert=true;try{newBookDraft=window.MTJAccountDrafts.create({api:JourneyAPI,user,key:'new:book',initial:{entryId:'book:custom-'+crypto.randomUUID(),baseRevision:null},collect:()=>({title:form.elements.title.value,author:form.elements.author.value}),restore:v=>{form.elements.title.value=v.title||'';form.elements.author.value=v.author||'';},onStatus:(_,text)=>{$('new-book-error').textContent=text;}});await newBookDraft.load();}catch(err){newBookDraft=null;$('new-book-error').textContent='Draft unavailable: '+err.message;}finally{newBookOpening=false;form.querySelector('.book-fields').inert=!newBookDraft;}};
+  $('new-book-form').addEventListener('input',()=>newBookDraft?.changed());
+  $('new-book-form').onsubmit=async e=>{e.preventDefault();if(saving||newBookOpening||!newBookDraft)return;saving=true;const f=e.target;f.querySelector('.book-fields').inert=true;try{await newBookDraft.flush();const id=newBookDraft.entryId;await JourneyAPI.save(id,'book',{...L.blank(),title:f.elements.title.value.trim(),author:f.elements.author.value.trim()},newBookDraft.baseRevision);await newBookDraft.clear();newBookDraft=null;await reload();render();$('new-book-dialog').close();f.reset();open(id.slice(5));}catch(err){$('new-book-error').textContent=err.message;}finally{saving=false;f.querySelector('.book-fields').inert=!newBookDraft;}};
+  window.addEventListener('beforeunload',e => { if (saving||opening||newBookOpening||newBookDraft?.isDirty()||accountDraft?.isDirty()) { e.preventDefault(); e.returnValue = ''; } });
   window.JourneyLibraryUI={reload:async()=>{await reload();render();},message,openNotes:open,getBooks:()=>L.books.slice(),value,recordKey,isReady:()=>ready};
   JourneyAPI.ready.then(async u=>{user=u;if(!u){message('Browse the reading path. Sign in to save notes, add books, or read your private PDFs.');return;}await reload();ready=true;render();message('Connected · reading records save directly to your account.');}).catch(err=>message('Account unavailable: '+err.message,true));
   render();

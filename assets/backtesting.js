@@ -464,6 +464,7 @@
   $('#bt-sync-retry').onclick=async()=>{if(!sync)return;pause();await sync.start();route();};
   $('#bt-sync-load').onclick=()=>{if(!sync)return;modal('Load online workspace?','<p>This replaces the sessions on this device with your online copy. Export a workspace backup before continuing if you need to keep local changes.</p><div class="bt-actions"><button class="bt-button" data-close-dialog>Cancel</button><button class="bt-button primary" id="bt-confirm-online">Load online copy</button></div>');$('#bt-confirm-online').onclick=async()=>{$('#bt-dialog').close();await sync.start({useRemote:true});route();};};
   window.addEventListener('online',async()=>{if(sync){pause();await sync.start();route();}});
+  window.MTJSaveGate?.register('replay',async()=>{if(sync){pause();persist();await sync.flush();if(sync.dirty||sync.saving||sync.blocked)throw Error('Replay changes have not reached the database. Retry account sync before signing out.');}});
   window.addEventListener('pagehide',()=>{if(sync)sync.flush();});
   if(window.Cloud?.ready){Cloud.ready.then(selectOwner,()=>selectOwner(null));try{Cloud.client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT')selectOwner(null);else if(event==='SIGNED_IN' && key!=='onepercent:backtesting:v1:'+session?.user?.id)selectOwner(session?.user);});}catch(_) {}}
   else selectOwner(null);

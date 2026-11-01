@@ -7,8 +7,8 @@ test('catalog aliases keep the original private reader and save notes to its ori
  const archived={id:'book:custom-extra',revision:2,payload:{...L.blank(),title:'An unrequested extra title',pdfPath:'owner/extra.pdf',libraryArchived:true}};
  let saved;
  const A={ready:Promise.resolve({id:'owner'}),list:async()=>[original,archived],save:async(id,kind,payload,revision)=>{saved={id,kind,payload,revision};return {id,kind,payload,revision:revision+1};}};
- const window={JourneyLibrary:L,addEventListener(){},confirm:()=>true};
- vm.runInNewContext(fs.readFileSync(require.resolve('../assets/library.js'),'utf8'),{window,JourneyAPI:A,document:{getElementById:node,createElement:()=>({}),querySelectorAll:()=>[]},console,Map,Set});
+ const window={JourneyLibrary:L,addEventListener(){},confirm:()=>true,MTJAccountDrafts:{create:({initial})=>({...initial,files:[],load:async()=>{},flush:async()=>{},clear:async()=>{},changed(){}})}};
+ vm.runInNewContext(fs.readFileSync(require.resolve('../assets/library.js'),'utf8'),{window,JourneyAPI:A,document:{getElementById:node,createElement:()=>({}),querySelectorAll:()=>[],querySelector:()=>({inert:false})},console,Map,Set});
  await new Promise(setImmediate);await window.JourneyLibraryUI.reload();await window.JourneyLibraryUI.reload();
  assert.equal(L.books.length,24);assert.match(node('book-grid').innerHTML,/reader.html\?book=custom-legacy/);assert.doesNotMatch(node('book-grid').innerHTML,/<h3>Rich-Dad-Poor-Dad-2<\/h3>/);
  node('book-grid').handlers.click({target:{closest:()=>({dataset:{book:'rich-dad-poor-dad'}})}});

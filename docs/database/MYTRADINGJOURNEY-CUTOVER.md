@@ -73,3 +73,20 @@ The review lists both account emails and counts before the user starts copying. 
 Copies never overwrite destination records or files. Existing conflicts stop the process. File bytes are checked with SHA-256 after upload, including duplicate-file retries. Attachment owner paths are remapped only when the referenced source file exists. Source snapshots are rechecked before and after the copy. A transfer report is offered only after verification. Partial copies are retained for retry; source data is never deleted.
 
 Remaining limits: this does not transfer browser-only Book Hub progress, local IndexedDB PDFs/annotations, or provision market-history services. It does not switch the website backend. Authentication and real storage/RLS transfer still require the user's sign-in; automated tests use isolated fake clients.
+
+
+## Cloud saving added to the current workspace — 1 November 2026
+
+The live application's source project remains `ecnxstqfnjaiibwiwwto` until account migration and history provisioning are verified. To make the current workspace persist user data now, migration `private_learning_progress_and_drafts` added owner-only `journey_learning` and `journey_drafts` tables there. The SQL is retained in `account-learning-drafts.sql`; the destination already has compatible tables. No source records were moved or deleted.
+
+- Book Hub learning profiles load from the account database into memory. Edits use debounced saves, revision checks and visible pending/error/conflict states. Account learning profiles no longer write to localStorage. Guests can explore in the current tab; they must sign in for persistence.
+- Private account PDFs are stored in `journey-private` with owner metadata records. Reader annotations for account PDFs use database records keyed by PDF bytes. Metadata checks do not download PDFs.
+- Explicit Library imports copy the current account’s previous browser progress/PDFs or the guest scope selected by the user. PDF records are enumerated only within the selected scope. Different PDFs sharing a book slug are preserved in Document Vault; existing cloud progress and browser originals are kept. Other users’ scopes are not silently imported.
+- Trade, mindset, builder, document, review, custom-book creation and account-book forms save resumable drafts. Existing-entry forms provide draft download and explicit reload controls for conflict recovery. Selected attachments upload privately while drafting. Completed entries keep stable IDs, and stale revisions cannot overwrite newer records.
+- Reader note text autosaves to the account annotation record while typing.
+- Sign-out flushes registered learning, draft, reader, replay and appearance saves. A pending upload, conflict or failure blocks sign-out with an actionable message. The generic discard confirmation was removed.
+- The staged transfer now also copies database learning profiles and drafts, in addition to records, files and replay state.
+
+Validation: 216 automated tests passed. Unit/integration models cover concurrent devices, ownership filters, failed writes, pending edits, retries, draft restore/clear and transfer ownership mapping. Browser checks used isolated clients, not real user credentials, and verified Book Hub note acknowledgments, draft save/restore/completion, and the sign-out gate. Transactional database checks verified authenticated-owner access and different-owner invisibility, then rolled back the probes. Anonymous SELECT privileges are absent on both new tables.
+
+The source project's security advisor reports existing history/Auth-function advisories unrelated to these two new tables. No shared TheOnePercent functions or Auth settings were changed as part of this update. A real signed-in cross-device check and the destination cutover remain unverified until user authentication is completed.

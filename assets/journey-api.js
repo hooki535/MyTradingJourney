@@ -30,7 +30,8 @@
   async function asset(path) { const u=await account();if(!path.startsWith(u.id+'/'))throw Error('File is not part of your account.');const {data,error}=await client.storage.from('journey-private').createSignedUrl(path,3600);if(error)throw error;return data.signedUrl; }
   async function dropFile(path) {if(!path)return;const u=await account();if(!path.startsWith(u.id+'/'))throw Error('Invalid file owner.');const {error}=await client.storage.from('journey-private').remove([path]);if(error)throw error;}
   function login(page='journey',hash=location.hash) {setReturn(page,hash);location.href='login.html';}
-  window.JourneyAPI={client,ready,list,get,save,remove,upload,asset,dropFile,login};
+  async function signOut(){await window.MTJSaveGate?.flush();const {error}=await client.auth.signOut();if(error)throw error;}
+  window.JourneyAPI={client,ready,signOut,list,get,save,remove,upload,asset,dropFile,login};
   window.Cloud={client,ready,setReturn};
   client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT'){user=null;location.reload();}});
 })();
