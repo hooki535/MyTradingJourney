@@ -51,3 +51,24 @@ test('chart context stays isolated to its portfolio market and never enters a ba
  const old=E.snapshot(s),earlier=bars.slice(0,50).map(b=>({...b,t:b.t-3000}));F.setContext(s,earlier);assert.equal(F.context(s).length,50);
  E.selectMarket(s,'GBPUSD');assert.equal(F.context(s).length,0);E.selectMarket(s,'EURUSD');assert.equal(F.context(s).length,50);assert.deepEqual(E.snapshot(s),old);
 });
+
+test('session starts retain thirty warm-up candles and keep the requested first candle hidden',()=>{
+ const first=F.replayStart(bars,new Date(bars[30].t*1000).toISOString(),{symbol:'EURUSD'});
+ assert.equal(first,29);
+ const s=E.createSession({symbol:'EURUSD',interval:'1m',startBalance:10000,multiplier:1,cursor:first},bars);
+ assert.equal(s.cursor,29);E.step(s);assert.equal(s.candles[s.cursor].t,bars[30].t);
+ assert.equal(F.replayStart(bars,''),undefined);
+});
+test('the final available candle is a valid start with one replay step remaining',()=>{
+ const cursor=F.replayStart(bars,new Date(bars.at(-1).t*1000).toISOString());
+ assert.equal(cursor,bars.length-2);
+ const s=E.createSession({symbol:'EURUSD',interval:'1m',startBalance:10000,multiplier:1,cursor},bars);
+ assert.equal(E.step(s),true);assert.equal(s.cursor,bars.length-1);assert.equal(E.step(s),false);
+});
+test('invalid replay dates report actual coverage and offer an explicit first-valid date',()=>{
+ for(const t of [bars[0].t-60,bars[29].t,bars.at(-1).t+60]){
+  assert.throws(()=>F.replayStart(bars,new Date(t*1000).toISOString(),{symbol:'GBPJPY'}),error=>error.code==='REPLAY_START_RANGE'&&error.firstValid===bars[30].t&&error.message.includes('GBPJPY')&&error.message.includes('UTC'));
+ }
+ assert.throws(()=>F.replayStart(bars,'not-a-date'),/valid UTC/);
+ assert.equal(F.replayStart(bars,new Date(bars[50].t*1000).toISOString()),49);
+});

@@ -50,3 +50,10 @@ test('earlier chart history excludes the saved dataset and every future candle',
  assert.deepEqual(await h.before('histdata:EURUSD:H1',Date.parse('2025-01-01T00:00Z')/1000),[]);
  await assert.rejects(h.before('histdata:EURUSD:H1',first,10001),/Invalid/);
 });
+
+test('history catalogue keeps every available pair from the authenticated source',async()=>{
+ const symbols=['EURUSD','GBPUSD','USDJPY','USDCAD','USDCHF','AUDUSD','NZDUSD','GBPJPY','EURJPY','EURGBP','AUDJPY','CADJPY','CHFJPY','NZDJPY','XAUUSD','XAGUSD','US30','BTCUSD','EURCAD','GBPCAD','AUDCAD'];
+ const sample={provider:'histdata',timeframe:'H1',first_utc:'2023-01-01T00:00:00Z',last_utc:'2026-10-23T21:00:00Z',candle_count:1000};
+ const calls=[],source={rpc:async name=>{calls.push(name);return {data:symbols.map(symbol=>({...sample,symbol}))};}};
+ const rows=await new History(source).catalog();assert.equal(rows.length,symbols.length);assert.deepEqual(rows.map(r=>r.symbol).sort(),symbols.slice().sort());assert.deepEqual(calls,['history_catalog']);
+});

@@ -26,11 +26,25 @@
   return {bars,toDisplay,toBase,bucket:t=>bucket(t,key)};
  }
  function historyStart(start,interval){if(!start)return '';const t=Date.parse(start+'Z');if(!Number.isFinite(t)||!seconds(interval))throw Error('Choose a valid history start and interval.');return new Date(t).toISOString().slice(0,16);}
+ function replayStart(bars,start,{symbol='This pair',context=30}={}){
+  if(!start)return undefined;
+  const value=String(start),t=Date.parse(/(?:Z|[+-]\d\d:\d\d)$/i.test(value)?value:value+'Z')/1000;
+  if(!Number.isFinite(t))throw Error('Choose a valid UTC start date.');
+  const index=bars.findIndex(b=>b.t>=t);
+  if(index<context||index<0){
+   const format=n=>new Date(n*1000).toISOString().slice(0,16).replace('T',' ')+' UTC';
+   const error=Error(bars.length>context?symbol+' replay can start from '+format(bars[context].t)+' through '+format(bars.at(-1).t)+' in the selected history. The chart needs '+context+' earlier candles. Choose a date in this range, or clear Start Date.':symbol+' needs more history: at least '+(context+1)+' candles are required.');
+   error.code='REPLAY_START_RANGE';error.firstValid=bars[context]?.t;throw error;
+  }
+  // The candle at the chosen date remains hidden until the next replay step.
+  // Starting at the final candle leaves exactly one valid replay step.
+  return index-1;
+ }
  function coverage(s,key=selected(s)){
   function count(frame){return project(s,frame).bars.length;}
   const candles=count(key),candidates=choices.filter(([frame,n])=>available(s,frame)&&n<(seconds(key)||base(s))).reverse();
   const recommended=candles<30?(candidates.find(([frame])=>count(frame)>=30)?.[0]||null):null;
   return {candles,recommended,first:context(s)[0]?.t||s.candles[0].t,revealed:s.candles[s.cursor].t,last:s.candles.at(-1).t};
  }
- return {choices,seconds,base,available,selected,bucket,project,historyStart,coverage,context,setContext};
+ return {choices,seconds,base,available,selected,bucket,project,historyStart,replayStart,coverage,context,setContext};
 });

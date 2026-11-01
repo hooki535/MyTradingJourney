@@ -216,7 +216,7 @@
     form.elements.start.closest('label').querySelector('span').textContent='Start Date (UTC)';
     form.elements.end.closest('label').querySelector('span').textContent='End date (optional)';
     const moreSettings=document.createElement('details');moreSettings.className='bt-session-more full';moreSettings.innerHTML='<summary>Advanced settings</summary>';moreSettings.append(advanced,dataSettings);grid.append(moreSettings);
-    dataSettings.append(archiveCoverage);
+    // Keep the active source and its coverage beside the date fields, outside collapsed settings.
     form.previousElementSibling?.classList.add('bt-session-intro');
     form.querySelector('[type=submit]').textContent='Create';
     form.elements.name.closest('label').querySelector('span').textContent='Name (optional)';
@@ -288,9 +288,9 @@
         if(!$('#bt-dialog').open || form!==$('#bt-new-form'))return;
         if(key!==requestKey || !form.isConnected)throw Error('Workspace changed while reading the dataset. Start again.');
         bars=bars || E.parseCSV(text);if(f.get('end')){const cutoff=Date.parse(f.get('end')+'Z')/1000;if(!Number.isFinite(cutoff))throw Error('Choose a valid UTC end date.');bars=E.validateBars(bars.filter(b=>b.t<=cutoff));}let cursor;
-        if(f.get('start')){const t=Date.parse(f.get('start')+'Z')/1000;cursor=bars.findIndex(b=>b.t>=t);if(cursor<30 || cursor>=bars.length-1)throw Error('Choose a date inside the dataset with 30 earlier candles and at least one candle remaining.');cursor--;}
+        if(f.get('start'))cursor=window.BacktestFrames.replayStart(bars,f.get('start'),{symbol:f.get('symbol')});
         const extra=await loadExtras(f);if(key!==requestKey||!form.isConnected)throw Error('Workspace changed while loading pairs.');const options={...Object.fromEntries(f),fxMode:d?.fxMode||(f.get('dataset')==='cloud'&&f.get('symbol').startsWith('USD')?'inverse':'fixed'),challenge:challengeDraft,source,cursor:cursor??cloudCursor??(d?.interval==='1m'?Math.min(bars.length-31,1440):undefined),strategySnapshot:state.strategies.find(s=>s.id===f.get('strategyId'))};const s=extra.length?E.createPortfolio({...options,startTime:f.get('start')?Date.parse(f.get('start')+'Z')/1000:(cloudCursor!==undefined?bars[cloudCursor].t:d?.interval==='1m'?bars[Math.min(bars.length-31,1440)].t:undefined),endTime:f.get('end')?Date.parse(f.get('end')+'Z')/1000:undefined},[{...options,candles:bars},...extra]):E.createSession(options,bars);state.sessions.push(s);const saved=persist();$('#bt-dialog').close();location.hash='session/'+s.id;toast(saved?'Session created. Future candles are hidden.':'Session created for this tab. Export a backup to keep it.');
-      } catch(error){if(form.isConnected)form.querySelector('#bt-form-error').textContent=error.message;else toast(error.message);} finally{busy=false;button.disabled=false;button.textContent='Create';}
+      } catch(error){if(form.isConnected){const feedback=form.querySelector('#bt-form-error');feedback.textContent=error.message;if(error.code==='REPLAY_START_RANGE'&&Number.isFinite(error.firstValid)){const choose=document.createElement('button');choose.type='button';choose.className='bt-button small';choose.textContent='Use first available replay start';choose.onclick=()=>{form.elements.start.value=new Date(error.firstValid*1000).toISOString().slice(0,16);feedback.textContent='Start date updated. Press Create to open the session.';};feedback.append(document.createElement('br'),choose);}}else toast(error.message);} finally{busy=false;button.disabled=false;button.textContent='Create';}
     };
   }
   function strategyForm(existing=null){

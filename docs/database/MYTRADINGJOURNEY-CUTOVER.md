@@ -33,7 +33,7 @@ A new database does not automatically move authentication users, OAuth configura
 2. Configure Google OAuth in the new project using secrets entered directly in the provider dashboards; do not commit OAuth client secrets or database passwords.
 3. Establish verified user identity mapping between the projects. Do not export password hashes into client-side code or remap ownership based on an unverified client-supplied email.
 4. Transfer the user's workspace rows and private files with explicit owner mapping; verify counts, PDF readability and attachment references. Retain the source until the destination has been verified.
-5. Transfer replay state and provision or migrate the market-history functions/catalog used by Backtesting Lab.
+5. Transfer personal replay state only. Per the user’s 1 November instruction, retain TheOnePercent as the read-only candlestick-history source for every available pair. Do not move, remove, or replace its history tables, catalog, payloads, or RPCs. Before a future personal-account cutover, preserve separately authenticated access to this original history source; destination Auth tokens are not valid source-project tokens.
 6. Connect Book Hub progress and reader device files to database/private storage sync. Offer an explicit import for device-only and guest progress; never silently combine different accounts.
 7. Implement debounced draft saves with optimistic revision checks. Flush pending saves before sign-out. Block sign-out with an actionable error if a save fails; report saved state only after database acknowledgment.
 8. Change the common Supabase configuration across JourneyAPI and any legacy Cloud clients together. Use a project-specific auth storage key so TheOnePercent and MyTradingJourney sessions are independent.
@@ -90,3 +90,10 @@ The live application's source project remains `ecnxstqfnjaiibwiwwto` until accou
 Validation: 216 automated tests passed. Unit/integration models cover concurrent devices, ownership filters, failed writes, pending edits, retries, draft restore/clear and transfer ownership mapping. Browser checks used isolated clients, not real user credentials, and verified Book Hub note acknowledgments, draft save/restore/completion, and the sign-out gate. Transactional database checks verified authenticated-owner access and different-owner invisibility, then rolled back the probes. Anonymous SELECT privileges are absent on both new tables.
 
 The source project's security advisor reports existing history/Auth-function advisories unrelated to these two new tables. No shared TheOnePercent functions or Auth settings were changed as part of this update. A real signed-in cross-device check and the destination cutover remain unverified until user authentication is completed.
+
+
+## Market history remains shared — 1 November 2026
+
+The user explicitly confirmed that TheOnePercent should continue supplying historical candles for all available pairs. The active workspace client still points to `ecnxstqfnjaiibwiwwto`, and `BacktestCloudHistory.History` still reads its existing catalog/month/payload RPCs through that client. No history data, pair lists, permissions, storage, or RPC definitions were changed.
+
+A create-session warning was traced to date-range validation. The UI now keeps the selected source/coverage beside the date fields, reports concrete eligible dates when context is insufficient, offers an explicit first-valid-date action, and accepts a final-candle start that leaves one replay step. It does not substitute prices, shift the chosen date silently, or remove the warm-up requirement. A later personal-database cutover must retain the original source session or provide an authenticated server bridge before changing account clients.
