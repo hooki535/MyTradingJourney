@@ -1,0 +1,160 @@
+{
+  "source": "https://github.com/Leo4815162342/dukascopy-node/blob/master/src/utils/instrument-meta-data/generated/instrument-meta-data.json",
+  "verified_on": "2026-11-04",
+  "instruments": [
+    {
+      "symbol": "AUDCAD",
+      "provider_symbol": "AUDCAD",
+      "price_scale": 100000,
+      "earliest_tick": "2006-01-03T00:00:05.860Z",
+      "earliest_minute": "2006-01-03T00:00:00.000Z"
+    },
+    {
+      "symbol": "AUDCHF",
+      "provider_symbol": "AUDCHF",
+      "price_scale": 100000,
+      "earliest_tick": "2006-03-01T00:01:00.898Z",
+      "earliest_minute": "2006-03-01T00:01:00.000Z"
+    },
+    {
+      "symbol": "AUDNZD",
+      "provider_symbol": "AUDNZD",
+      "price_scale": 100000,
+      "earliest_tick": "2006-12-12T00:01:02.665Z",
+      "earliest_minute": "2006-12-12T00:01:00.000Z"
+    },
+    {
+      "symbol": "EURUSD",
+      "provider_symbol": "EURUSD",
+      "price_scale": 100000,
+      "earliest_tick": "2003-05-04T19:00:00.048Z",
+      "earliest_minute": "2003-05-04T19:00:00.000Z"
+    },
+    {
+      "symbol": "EURGBP",
+      "provider_symbol": "EURGBP",
+      "price_scale": 100000,
+      "earliest_tick": "2003-08-03T17:00:01.509Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "EURCAD",
+      "provider_symbol": "EURCAD",
+      "price_scale": 100000,
+      "earliest_tick": "2004-10-25T00:00:05.847Z",
+      "earliest_minute": "2004-10-25T00:00:00.000Z"
+    },
+    {
+      "symbol": "EURCHF",
+      "provider_symbol": "EURCHF",
+      "price_scale": 100000,
+      "earliest_tick": "2003-08-03T17:00:01.331Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "EURJPY",
+      "provider_symbol": "EURJPY",
+      "price_scale": 1000,
+      "earliest_tick": "2003-08-03T17:00:00.695Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "EURAUD",
+      "provider_symbol": "EURAUD",
+      "price_scale": 100000,
+      "earliest_tick": "2005-10-07T05:54:01.827Z",
+      "earliest_minute": "2005-10-07T05:54:00.000Z"
+    },
+    {
+      "symbol": "EURNZD",
+      "provider_symbol": "EURNZD",
+      "price_scale": 100000,
+      "earliest_tick": "2006-01-02T22:38:22.520Z",
+      "earliest_minute": "2006-01-02T22:38:00.000Z"
+    },
+    {
+      "symbol": "USDCHF",
+      "provider_symbol": "USDCHF",
+      "price_scale": 100000,
+      "earliest_tick": "2003-05-04T20:00:00.375Z",
+      "earliest_minute": "2003-05-04T20:00:00.000Z"
+    },
+    {
+      "symbol": "USDJPY",
+      "provider_symbol": "USDJPY",
+      "price_scale": 1000,
+      "earliest_tick": "2003-05-04T17:00:01.425Z",
+      "earliest_minute": "2003-05-04T17:00:00.000Z"
+    },
+    {
+      "symbol": "USDCAD",
+      "provider_symbol": "USDCAD",
+      "price_scale": 100000,
+      "earliest_tick": "2003-08-03T17:00:00.271Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "CADCHF",
+      "provider_symbol": "CADCHF",
+      "price_scale": 100000,
+      "earliest_tick": "2006-01-02T22:38:05.365Z",
+      "earliest_minute": "2006-01-02T22:38:00.000Z"
+    },
+    {
+      "symbol": "CADJPY",
+      "provider_symbol": "CADJPY",
+      "price_scale": 1000,
+      "earliest_tick": "2004-10-25T00:01:01.975Z",
+      "earliest_minute": "2004-10-25T00:01:00.000Z"
+    },
+    {
+      "symbol": "GBPUSD",
+      "provider_symbol": "GBPUSD",
+      "price_scale": 100000,
+      "earliest_tick": "2003-05-04T20:00:02.666Z",
+      "earliest_minute": "2003-05-04T20:00:00.000Z"
+    },
+    {
+      "symbol": "GBPCHF",
+      "provider_symbol": "GBPCHF",
+      "price_scale": 100000,
+      "earliest_tick": "2003-08-03T17:00:02.482Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "GBPNZD",
+      "provider_symbol": "GBPNZD",
+      "price_scale": 100000,
+      "earliest_tick": "2006-01-02T22:38:05.298Z",
+      "earliest_minute": "2006-01-02T22:38:00.000Z"
+    },
+    {
+      "symbol": "GBPAUD",
+      "provider_symbol": "GBPAUD",
+      "price_scale": 100000,
+      "earliest_tick": "2006-03-22T00:00:08.802Z",
+      "earliest_minute": "2006-03-22T00:00:00.000Z"
+    },
+    {
+      "symbol": "GBPJPY",
+      "provider_symbol": "GBPJPY",
+      "price_scale": 1000,
+      "earliest_tick": "2003-08-03T17:00:01.047Z",
+      "earliest_minute": "2003-08-03T17:00:00.000Z"
+    },
+    {
+      "symbol": "XAUUSD",
+      "provider_symbol": "XAUUSD",
+      "price_scale": 1000,
+      "earliest_tick": "2003-05-05T00:01:03.421Z",
+      "earliest_minute": "2003-05-05T00:01:00.000Z"
+    },
+    {
+      "symbol": "US30",
+      "provider_symbol": "USA30IDXUSD",
+      "price_scale": 1000,
+      "earliest_tick": "2013-01-01T05:44:03.104Z",
+      "earliest_minute": "2013-09-30T13:34:00.000Z"
+    }
+  ]
+}
