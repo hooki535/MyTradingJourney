@@ -35,3 +35,7 @@ No account/database configuration, authentication logic, data schema, saved reco
 - The same harness renders the five editorial workspace routes and verifies the backtesting banner is hidden on active session routes and updates for collection routes.
 - All local HTML asset/link targets and duplicate IDs were checked. JavaScript syntax and Git whitespace checks pass.
 - Current landing and guest journal layouts were inspected in the browser; the remaining routes were reviewed through their actual source/rendering modules. Authenticated account edits were not used for testing. Public visual checks of the deployed changes are performed after publication; no claim is made of exhaustive signed-in workflow verification.
+
+Live visual follow-up: the deployed homepage and journal images loaded correctly. The browser check identified the icon-only section finder label and workspace-header spacing; both were corrected in the finishing change. Existing browser-cached documents required a reload to obtain the new HTML asset versions.
+
+The deployed overview, journal, mindset, builder, document and review routes, library (24 cards), backtesting collections, field notes, reader and access pages were checked in the desktop browser. No horizontal page overflow was observed. The section finder filtered and navigated to the journal successfully. Backtesting remains account-gated; no private sessions or account writes were exercised.
