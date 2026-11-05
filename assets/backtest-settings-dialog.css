@@ -29,3 +29,13 @@
 .bt-template-name{display:flex;padding:12px 20px;gap:8px;align-items:center}.bt-template-name[hidden]{display:none}.bt-template-name input{flex:1;min-width:0}
 @media(max-width:480px){.bt-settings-scroll{padding:12px 14px 16px}.bt-level-grid{column-gap:10px}.bt-level-row{grid-template-columns:17px minmax(0,1fr) 28px 12px;gap:5px}.bt-level-row input[type="color"]{width:28px}.bt-settings-inline{gap:4px}.bt-settings-inline select{max-width:85px}.bt-settings-tabs{gap:20px}.bt-settings-footer>select{max-width:145px}.bt-settings-footer{padding:12px}.bt-setting-font{align-items:flex-start;flex-direction:column}}
 
+
+/* Shared properties window: compact tabs, stable footer and narrow-screen rows. */
+:is(#bt-dialog,#bt-review-properties)[data-kind="drawing-settings"] .bt-dialog-head{cursor:move;touch-action:none;user-select:none}
+#bt-drawing-settings-form .bt-settings-tabs{gap:22px;overflow-x:auto;white-space:nowrap}
+#bt-drawing-settings-form .bt-settings-tabs button{flex:none}
+.bt-settings-note{font:11px/1.5 system-ui;color:#868993;margin:8px 0 18px}
+#bt-drawing-settings-form [data-position-coordinates]{border-top:1px solid #363a45;padding-top:16px;margin-top:16px}
+#bt-drawing-settings-form .bt-settings-field>span{max-width:54%}
+#bt-drawing-settings-form .bt-setting-check{justify-content:flex-start}
+@media(max-width:480px){#bt-drawing-settings-form .bt-settings-tabs{gap:18px;padding:0 14px}#bt-drawing-settings-form .bt-setting-line,#bt-drawing-settings-form .bt-setting-fill{flex-wrap:wrap}.bt-coordinate-row,.bt-coordinate-head{grid-template-columns:70px minmax(0,1fr) minmax(0,.8fr);gap:7px}}

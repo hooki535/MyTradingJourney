@@ -11,13 +11,18 @@
   if(d?.glyph)return s.style.filter(f=>['size','color'].includes(f.key));
   const allowed=new Set(['line','color']);if(d?.group==='shapes'&&['rectangle','rotatedrect','circle','ellipse','triangle','arc'].includes(id)||d?.group==='notes'||['measure','pricerange','daterange'].includes(id))allowed.add('background');
   if(d?.group==='notes'){['font','text','align','wrap'].forEach(k=>allowed.add(k));}
-  if(['long','short'].includes(id)){allowed.add('profit');allowed.add('loss');}
+  if(id==='channel')allowed.add('background');
+  if(['long','short'].includes(id)){['profit','loss','accountSize','riskPct','lotSize','pointValue','qtyPrecision','textFont','showPrices','showStats','alwaysStats','compact'].forEach(k=>allowed.add(k));}
   if(id==='highlighter'){allowed.add('width');allowed.add('opacity');}
   if(id==='brush')allowed.add('capStyle');
+  if(['trend','ray','info','channel','rectangle'].includes(id))['extendLeft','extendRight'].forEach(k=>allowed.add(k));
+  if(['trend','ray','extended','info','horizontal','horizontalray','crossline','long','short'].includes(id))allowed.add('showPrice');
+  if(['trend','ray','extended','info','arrow','forecast','pricerange','daterange','measure'].includes(id))['showStats','showPips','showPercent','showBars','showTime','showAngle'].forEach(k=>allowed.add(k));
+  if(d?.group==='patterns')['showLabels','showRatios','showWave','labelFont'].forEach(k=>allowed.add(k));
   const result=[...s.style,...(s.text||[])].filter(f=>f.key&&allowed.has(f.key));
   if(!result.some(f=>f.key==='line'||f.key==='color')&&id!=='highlighter')result.unshift(line());
   if(d?.group==='notes'&&!result.some(f=>f.type==='font'))result.push(font());
-  if(d?.group!=='notes'&&(s.text||[]).length){result.push({type:'text',key:'text',label:'Text',def:''},font('textFont'));}
+  if(d?.group!=='notes'&&!['long','short'].includes(id)&&(s.text||[]).length){result.push({type:'text',key:'text',label:'Text',def:''},font('textFont'));}
   return result;
  }
  const extraFib=[-.27,1.414,2.272,2.414,2,3,3.272,3.414,4,4.272,4.414,4.618,4.764];
@@ -32,7 +37,7 @@
   case 'levels':out[f.key]=levels(v);break;
   case 'check':out[f.key]=v===true;break;
   case 'color':out[f.key]=color(v,f.label);break;
-  case 'number':out[f.key]=number(v,f.min??-1e8,f.max??1e8,f.label);break;
+  case 'number':out[f.key]=number(v,f.min??-1e8,f.max??1e8,f.label);if(f.key==='qtyPrecision'&&!Number.isInteger(out[f.key]))throw Error('Quantity precision must be a whole number.');break;
   case 'select':if(!f.options.includes(v))throw Error('Choose a valid '+f.label.toLowerCase()+'.');out[f.key]=v;break;
   case 'text':out[f.key]=String(v??'').slice(0,200);break;
  }}return out;}

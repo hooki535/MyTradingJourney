@@ -122,9 +122,9 @@ reg('elliottcorrection', 'Elliott correction wave (ABC)', { style: [L('line', 'L
 
 /* -- Forecasting & position tools -- */
 const POS = (c1, c2) => [
-  N('accountSize', 'Account size', 10000, 0), N('riskPct', 'Risk %', 1, 0, 100, 0.1), N('lotSize', 'Lot size', 1, 0, 100000, 'any'),
+  N('accountSize', 'Account size (USD)', 10000, 1, 1e9), N('riskPct', 'Risk %', 1, .01, 100, 0.1), N('lotSize', 'Units per lot', 1, .00000001, 1e9, 'any'), N('pointValue', 'USD per price unit per unit', 1, .00000001, 1e9, 'any'), N('qtyPrecision', 'Quantity precision', 4, 0, 8, 1),
   FILL('profit', 'Profit zone', c1, 0.2), FILL('loss', 'Stop zone', c2, 0.2),
-  L('line', 'Lines', '#787b86', 1), CK('showStats', 'Show stats (R:R, risk $, qty)', true), CK('compact', 'Compact stats'),
+  L('line', 'Lines', '#787b86', 1), FONT('textFont', 'Text'), CK('showPrices', 'Price labels', true), CK('showStats', 'Show stats', true), CK('alwaysStats', 'Always show stats', false), CK('compact', 'Compact stats'),
 ];
 reg('longposition', 'Long position', { style: POS('#089981', '#f23645'), pointLabels: ['Entry', 'Stop loss', 'Take profit'] });
 reg('shortposition', 'Short position', { style: POS('#089981', '#f23645'), pointLabels: ['Entry', 'Stop loss', 'Take profit'] });
