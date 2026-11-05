@@ -18,3 +18,9 @@
 .site-search-summary{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0 20px;color:var(--mj-muted,#687164);font-size:12px}.empty-books h3{font:24px Georgia,serif}.empty-books .learn-button{margin-top:8px}
 
 .journey-top,.learn-top{gap:18px}.journey-top .workspace-header-home,.learn-top>a{margin-left:auto}.journey-top .site-finder-button,.learn-top .site-finder-button{margin-left:0}.access-header{gap:18px;flex-wrap:wrap}
+/* Keep the existing mobile main-menu rules scoped away from in-page navigation. */
+.site-section-nav{position:static;inset:auto;box-shadow:none}
+#site-finder-results{position:static;inset:auto;padding:0;border:0;background:transparent;box-shadow:none}
+.site-lab-banner nav{position:static;inset:auto;box-shadow:none}
+@media(max-width:760px){.ref-site .ref-header{gap:10px}.ref-site .ref-hero-visual{height:390px}}
+@media(max-width:420px){.ref-header .brand{font-size:13px;gap:8px}.ref-header .brand small{display:none}.ref-header .monogram{width:30px;height:34px}.ref-header .menu-toggle{padding:8px;gap:6px}.ref-header .site-finder-button{min-width:32px;padding:5px}}

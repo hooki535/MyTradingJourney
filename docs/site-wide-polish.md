@@ -39,3 +39,5 @@ No account/database configuration, authentication logic, data schema, saved reco
 Live visual follow-up: the deployed homepage and journal images loaded correctly. The browser check identified the icon-only section finder label and workspace-header spacing; both were corrected in the finishing change. Existing browser-cached documents required a reload to obtain the new HTML asset versions.
 
 The deployed overview, journal, mindset, builder, document and review routes, library (24 cards), backtesting collections, field notes, reader and access pages were checked in the desktop browser. No horizontal page overflow was observed. The section finder filtered and navigated to the journal successfully. Backtesting remains account-gated; no private sessions or account writes were exercised.
+
+Responsive source review also isolated the new in-page navigation from legacy mobile nav positioning and tightened the small-screen public header. Mobile viewport emulation was not available in the browser surface, so no mobile visual-verification claim is made.
