@@ -49,3 +49,16 @@ test('magnet can anchor to an earlier context candle rather than clamping to the
  h.view.render(s,false,30);h.view.magnet();draw(h,0,119);
  assert.equal(s.annotations[0].points[0].p,120);assert.equal(s.annotations[0].points[0].i,-1);
 });
+test('context levels validate, remain undoable, and do not touch execution or replay candles',()=>{
+ const h=harness(),s=session(),before=JSON.stringify({candles:s.candles,cursor:s.cursor,trades:s.trades});h.view.render(s,false,30);
+ assert.equal(h.view.addLevel(NaN),false);assert.equal(h.view.addLevel(-1),false);assert.equal(h.view.addLevel(101.125),true);assert.deepEqual(s.drawings,[101.125]);
+ h.view.undo();assert.equal(s.drawings.length,0);h.view.redo();assert.equal(s.drawings[0],101.125);
+ while(s.drawings.length<30)h.view.addLevel(100);assert.equal(h.view.addLevel(102),false);
+ assert.equal(JSON.stringify({candles:s.candles,cursor:s.cursor,trades:s.trades}),before);
+});
+test('context pointer uses chart price precision and a right click cannot start a brush stroke',()=>{
+ const h=harness(),s=session();h.view.render(s,false,30);
+ assert.equal(h.view.atPointer({clientX:5,clientY:120.123456}).p,120.123);
+ assert.equal(h.view.atPointer({clientX:999,clientY:120}),null);
+ h.view.tool('brush');assert.doesNotThrow(()=>h.host.svg.onpointerdown({button:2}));assert.equal(s.annotations.length,0);
+});

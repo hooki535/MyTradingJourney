@@ -1,4 +1,4 @@
-/* TradingView Lightweight Charts with TheOnePercent's saved drawing tools. */
+/* TradingView Lightweight Charts with MyTradingJourney's saved drawing tools. */
 (() => {
  'use strict';
  let chartSequence=0;
@@ -100,12 +100,12 @@
    if(!isLive){
     function select(e){if(tool!=='cursor')return;e.stopPropagation();selected=a.id;callbacks.onSelect?.(a);repaint();}
     group.onclick=select;
-    group.onpointerdown=e=>{if(tool!=='cursor')return;const start=readPoint(e);if(!start)return;select(e);lastHit={id:a.id,x:e.clientX,y:e.clientY,at:Date.now()};if(a.locked)return;drag={a,start,old:JSON.parse(JSON.stringify(a)),before:snapshot(),changed:false};svg.style.pointerEvents='all';svg.setPointerCapture(e.pointerId);e.preventDefault();};
+    group.onpointerdown=e=>{if(e.button>0||tool!=='cursor')return;const start=readPoint(e);if(!start)return;select(e);lastHit={id:a.id,x:e.clientX,y:e.clientY,at:Date.now()};if(a.locked)return;drag={a,start,old:JSON.parse(JSON.stringify(a)),before:snapshot(),changed:false};svg.style.pointerEvents='all';svg.setPointerCapture(e.pointerId);e.preventDefault();};
     if(selected===a.id&&!a.locked){
       const anchors=a.points.map((v,i)=>({point:v,index:i}));
       if(a.type==='long'||a.type==='short'){anchors.length=0;anchors.push({point:a.points[0],index:0},{point:{i:a.points[0].i,p:a.points[1].p},index:'stop'},{point:{i:a.points[0].i,p:Suite.positionStats(a).target},index:'target'},{point:{i:a.points[1].i,p:a.points[0].p},index:'right'});}
       if(a.type==='channel')anchors.push({point:{i:a.points[0].i,p:a.points[0].p+(a.offset??Math.max(Math.abs(a.points[1].p-a.points[0].p)*.5,a.points[0].p*.001))},index:'offset'});
-      anchors.forEach(({point:v,index:i})=>{const pos=a.anchor?{x:a.anchor.x*(host.clientWidth-65),y:a.anchor.y*(chart.panes?.()[0]?.getHeight?.()||host.clientHeight-30)}:point(v);if(pos.x==null||pos.y==null)return;const handle=element('circle',{cx:pos.x,cy:pos.y,r:5,fill:'#15171c',stroke:'#4385ff','stroke-width':2,'data-handle':i,'pointer-events':'all'},group);handle.onpointerdown=e=>{e.preventDefault();e.stopPropagation();drag={a,i,old:JSON.parse(JSON.stringify(a)),before:snapshot(),changed:false};svg.style.pointerEvents='all';svg.setPointerCapture(e.pointerId);};});
+      anchors.forEach(({point:v,index:i})=>{const pos=a.anchor?{x:a.anchor.x*(host.clientWidth-65),y:a.anchor.y*(chart.panes?.()[0]?.getHeight?.()||host.clientHeight-30)}:point(v);if(pos.x==null||pos.y==null)return;const handle=element('circle',{cx:pos.x,cy:pos.y,r:5,fill:'#15171c',stroke:'#4385ff','stroke-width':2,'data-handle':i,'pointer-events':'all'},group);handle.onpointerdown=e=>{if(e.button>0)return;e.preventDefault();e.stopPropagation();drag={a,i,old:JSON.parse(JSON.stringify(a)),before:snapshot(),changed:false};svg.style.pointerEvents='all';svg.setPointerCapture(e.pointerId);};});
     }
    }
   }
@@ -162,7 +162,7 @@
     if(!valid(a)){callbacks.onError?.('Choose valid positive prices for this drawing.');pending=[];first=hover=null;repaint();return;}
     remember();current.annotations??=[];current.annotations.push(a);selected=a.id;pending=[];first=hover=null;tool=keepMode&&def.group!=='notes'&&!['long','short'].includes(a.type)?a.type:'cursor';callbacks.onChange?.();callbacks.onDrawing?.(a);callbacks.onSelect?.(a);repaint();
    }
-   svg.onpointerdown=e=>{if(!['brush','highlighter'].includes(tool))return;const p=readPoint(e);if(!p)return;pending=[p];first=p;freehand=e.pointerId;svg.setPointerCapture(e.pointerId);e.preventDefault();};
+   svg.onpointerdown=e=>{if(e.button>0||!['brush','highlighter'].includes(tool))return;const p=readPoint(e);if(!p)return;pending=[p];first=p;freehand=e.pointerId;svg.setPointerCapture(e.pointerId);e.preventDefault();};
    svg.onpointerup=e=>{if(freehand!==null){freehand=null;try{svg.releasePointerCapture(e.pointerId);}catch(_){}if(pending.length>1)commitDrawing();else{pending=[];first=null;repaint();}suppressClick=true;return;}if(!drag)return;const ended=drag,edited=drag.changed;drag=null;suppressClick=edited;try{svg.releasePointerCapture(e.pointerId);}catch(_){}if(edited)callbacks.onChange?.();repaint();if(!edited&&ended.i===undefined){const now=Date.now(),twice=lastTap&&lastTap.id===ended.a.id&&now-lastTap.at<400&&Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<5;lastTap={id:ended.a.id,at:now,x:e.clientX,y:e.clientY};if(twice){lastTap=null;callbacks.onSettings?.(ended.a);}}else lastTap=null;};
    svg.onpointercancel=()=>{freehand=null;drag=null;pending=[];first=hover=null;repaint();};
    svg.onclick=e=>{if(suppressClick){suppressClick=false;return;}if(drag||freehand!==null)return;if(tool==='cursor'){if(e.target===svg&&!(lastHit&&Date.now()-lastHit.at<500&&Math.hypot(e.clientX-lastHit.x,e.clientY-lastHit.y)<5)){selected=null;callbacks.onSelect?.(null);repaint();}return;}const p=readPoint(e),def=Suite.spec(tool);if(!p||!def||['brush','highlighter'].includes(tool))return;
@@ -243,6 +243,9 @@
    removeLevel(index){if(!current||!Number.isInteger(index)||index<0||index>=current.drawings.length)return false;remember();current.drawings.splice(index,1);changed();return true;},
    zoom(){const range=ts.getVisibleLogicalRange();if(range){const center=(range.from+range.to)/2,half=(range.to-range.from)/4;ts.setVisibleLogicalRange({from:center-half,to:center+half});}},
    fit(){ts.fitContent();},
+   latest(){ts.scrollToRealTime();},
+   atPointer(event){const point=readPoint(event);if(point){const close=current.candles[current.cursor].c,precision=close<20?5:close<1000?3:2;point.p=Number(point.p.toFixed(precision));}return point;},
+   addLevel(value){if(!current||!Number.isFinite(value)||value<=0)return false;if(current.drawings.length>=30){callbacks.onError?.('Maximum 30 levels.');return false;}remember();current.drawings.push(value);changed();return true;},
    async image(){const canvas=chart.takeScreenshot();if(svg){const data=new XMLSerializer().serializeToString(svg),url=URL.createObjectURL(new Blob([data],{type:'image/svg+xml'})),img=new Image();try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);}finally{URL.revokeObjectURL(url);}}return canvas.toDataURL('image/png');},
    destroy(){window.removeEventListener?.('themechange',applyTheme);observer?.disconnect();if(frame)cancelAnimationFrame(frame);markers?.detach();chart.remove();}
   };
