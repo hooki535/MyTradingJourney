@@ -268,7 +268,20 @@
     form.elements.start.closest('label').querySelector('span').textContent='Start Date (UTC)';
     form.elements.end.closest('label').querySelector('span').textContent='End date (optional)';
     const moreSettings=document.createElement('details');moreSettings.className='bt-session-more full';moreSettings.innerHTML='<summary>Advanced settings</summary>';moreSettings.append(advanced,dataSettings);grid.append(moreSettings);
-    // Keep the active source and its coverage beside the date fields, outside collapsed settings.
+    // The primary session flow is balance → pairs → dates; source selection belongs to advanced settings.
+    dataSettings.querySelector('summary').after(source,cloudField);dataSettings.querySelector('summary').textContent='History source & import';
+    archiveCoverage.append($('#bt-cloud-retry'));$('#bt-archive-range').setAttribute('role','status');
+    $('#bt-change-history').textContent='History options';$('#bt-change-history').onclick=()=>{moreSettings.open=true;dataSettings.open=true;source.scrollIntoView({block:'nearest'});form.elements.dataset.focus();};
+    pairPicker.open=true;
+    form.elements.dataset.closest('label').querySelector('span').textContent='History source';
+    form.elements.dataset.setAttribute('aria-label','History source');
+    form.elements.strategyId.options[0].textContent='Strategy (optional)';
+    form.elements.name.closest('label').classList.add('bt-session-placeholder');
+    form.elements.strategyId.closest('label').classList.add('bt-session-placeholder');
+    form.elements.description.closest('label').classList.add('bt-session-description');
+    for(const name of ['startBalance','start','end','strategyId','name','description'])form.elements[name].setAttribute('aria-label',({startBalance:'Account balance',start:'Start date UTC',end:'End date optional UTC',strategyId:'Strategy optional',name:'Session name optional',description:'Description optional'})[name]);
+
+    // Keep coverage beside dates while source and import controls stay under advanced settings.
     form.previousElementSibling?.classList.add('bt-session-intro');
     form.querySelector('[type=submit]').textContent='Create';
     form.elements.name.closest('label').querySelector('span').textContent='Name (optional)';
