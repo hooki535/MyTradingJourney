@@ -13,7 +13,7 @@
   let renderKind='candles',candles=priceSeries(renderKind);
   const ma=chart.addSeries(L.LineSeries,{color:'#a390ff',lineWidth:2,priceLineVisible:false,lastValueVisible:false});
   const extra=new Map();let markers=L.createSeriesMarkers?L.createSeriesMarkers(candles,[]):null;
-  let projectionLength=0,previous=-1,sessionId=null,visible=0,lines=[],current=null,tool='cursor',first=null,selected=null,drag=null,frame=null,hover=null,magnet=false,hidden=false,suppressClick=false,lastMA=false;
+  let projectionLength=0,projectionFirstTime=null,sessionId=null,visible=0,lines=[],current=null,tool='cursor',first=null,selected=null,drag=null,frame=null,hover=null,magnet=false,hidden=false,suppressClick=false,lastMA=false;
   const Suite=window.BacktestDrawingSuite;
   let pending=[],freehand=null,lastHit=null,lastTap=null;
   let projection=null,keepMode=false;
@@ -107,7 +107,7 @@
    if(pending.length){const pts=[...pending,...(hover?[hover]:[])],def=Suite.spec(tool);if(def&&pts.length>=2&&(!def.points||pts.length>=Math.max(2,def.points)))drawAnnotation({type:tool,points:pts,color:color('accent'),target:['long','short'].includes(tool)?pts[0].p+(tool==='long'?1:-1)*2*Math.abs(pts[0].p-pts[1].p):undefined},true);else for(let i=1;i<pts.length;i++){const a=point(pts[i-1]),b=point(pts[i]);element('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:color('accent'),'stroke-dasharray':'4 4','pointer-events':'none'});}for(const v of pending){const p=point(v);element('circle',{cx:p.x,cy:p.y,r:4,fill:'#131722',stroke:color('accent'),'pointer-events':'none'});}}
    if(first){const pos=point(first);if(pos.x!=null&&pos.y!=null)element('circle',{cx:pos.x,cy:pos.y,r:5,fill:color('accent'),'pointer-events':'none'});}
   }
-  function readPoint(event){if(!current)return null;const rect=svg.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,mainHeight=chart.panes?.()[0]?.getHeight?.()||host.clientHeight-30;if(x<0||x>host.clientWidth-65||y<25||y>mainHeight-5)return null;const logical=ts.coordinateToLogical(x),i=projection?projection.toBase(logical):logical,p=candles.coordinateToPrice(y);if(!Number.isFinite(i)||!Number.isFinite(p)||p<=0)return null;let result={i:Math.max(0,Math.min(current.cursor+100*Math.max(1,(window.BacktestFrames?.seconds(window.BacktestFrames.selected(current))||60)/(window.BacktestFrames?.base(current)||60)),i)),p};if(magnet){const index=Math.max(0,Math.min(current.cursor,Math.round(i))),bar=current.candles[index];result={i:index,p:[bar.o,bar.h,bar.l,bar.c].reduce((best,v)=>Math.abs(v-p)<Math.abs(best-p)?v:best,bar.o)};}return result;}
+  function readPoint(event){if(!current)return null;const rect=svg.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,mainHeight=chart.panes?.()[0]?.getHeight?.()||host.clientHeight-30;if(x<0||x>host.clientWidth-65||y<25||y>mainHeight-5)return null;const logical=ts.coordinateToLogical(x),i=projection?projection.toBase(logical):logical,p=candles.coordinateToPrice(y);if(!Number.isFinite(i)||!Number.isFinite(p)||p<=0)return null;let result={i:Math.max(0,Math.min(current.cursor+100*Math.max(1,(window.BacktestFrames?.seconds(window.BacktestFrames.selected(current))||60)/(window.BacktestFrames?.base(current)||60)),i)),p};if(magnet){const bars=projection?.bars||current.candles.slice(0,current.cursor+1),index=Math.max(0,Math.min(bars.length-1,Math.round(logical))),bar=bars[index];if(bar)result={i:projection?projection.toBase(index):index,p:[bar.o,bar.h,bar.l,bar.c].reduce((best,v)=>Math.abs(v-p)<Math.abs(best-p)?v:best,bar.o)};}return result;}
   if(svg){
    svg.onpointermove=e=>{
     const p=readPoint(e);if(!p)return;
@@ -159,9 +159,10 @@
   }
   return {
    render(s,showMA,barsVisible){
+    const range=ts.getVisibleLogicalRange?.();
     const kind=['candles','hollow','bars','line','area'].includes(s.chartType)?s.chartType:'candles';if(kind!==renderKind){markers?.detach?.();chart.removeSeries(candles);lines=[];candles=priceSeries(kind);markers=L.createSeriesMarkers?L.createSeriesMarkers(candles,[]):null;renderKind=kind;}
     current=s;lastMA=showMA;projection=window.BacktestFrames?.project(s)||{bars:s.candles.slice(0,s.cursor+1),toDisplay:i=>i,toBase:i=>i,bucket:t=>t};
-    const bars=projection.bars,shown={...s,candles:bars,cursor:bars.length-1},identity=s.id+':'+s.symbol+':'+(s.viewTimeframe||s.interval)+':'+renderKind,changed=previous!==s.cursor||sessionId!==identity;
+    const bars=projection.bars,shown={...s,candles:bars,cursor:bars.length-1},identity=s.id+':'+s.symbol+':'+(s.viewTimeframe||s.interval)+':'+renderKind;
     const precision=s.candles[s.cursor].c<20?5:s.candles[s.cursor].c<1000?3:2;candles.applyOptions({priceFormat:{type:'price',precision,minMove:10**-precision}});
     if(Array.isArray(s.reviewLevels)&&s.reviewLevels.length)candles.applyOptions({autoscaleInfoProvider:original=>{const info=original();if(!info)return info;const levels=s.reviewLevels.filter(n=>Number.isFinite(n)&&n>0);if(levels.length){info.priceRange.minValue=Math.min(info.priceRange.minValue,...levels);info.priceRange.maxValue=Math.max(info.priceRange.maxValue,...levels);}return info;}});
     candles.setData(bars.map(b=>['line','area'].includes(renderKind)?{time:b.t,value:b.c}:mapped(b)));ma.setData(bars.slice(19).map((_,i)=>average(shown,i+19)));
@@ -170,10 +171,16 @@
     const level=(value,title,c)=>lines.push(candles.createPriceLine({price:value,color:c,lineWidth:1,lineStyle:L.LineStyle.Dashed,axisLabelVisible:true,title}));
     for(const value of (hidden?[]:s.drawings))level(value,'Level',color('accent'));
     const p=s.position||s.pending;if(p){if(p.entry)level(p.entry,s.position?'Entry':'Queued',color('muted'));level(p.stop,'SL',color('down'));level(p.target,'TP',color('up'));}
-    if(changed||visible!==barsVisible||projectionLength!==bars.length)ts.setVisibleLogicalRange({from:bars.length-barsVisible,to:bars.length+7});
-    projectionLength=bars.length;
+    if(sessionId!==identity||visible!==barsVisible||!range)ts.setVisibleLogicalRange({from:bars.length-barsVisible,to:bars.length+7});
+    else{
+     // Follow new bars only when the latest candle was already in view. Keep
+     // the user's zoom width and anchor older views when context is prepended.
+     const prefix=bars.findIndex(b=>b.t===projectionFirstTime),shift=range.to>=projectionLength-1?bars.length-projectionLength:Math.max(0,prefix);
+     ts.setVisibleLogicalRange({from:range.from+shift,to:range.to+shift});
+    }
+    projectionLength=bars.length;projectionFirstTime=bars[0]?.t;
     if(markers){const rows=s.trades.filter(t=>!t.symbol||t.symbol===s.symbol).flatMap(t=>[{time:projection.bucket(t.entryTime),position:t.side==='long'?'belowBar':'aboveBar',color:'#4385ff',shape:t.side==='long'?'arrowUp':'arrowDown',text:t.side==='long'?'Buy':'Sell'},{time:projection.bucket(t.exitTime),position:'aboveBar',color:t.pnl>=0?'#45d5a2':'#ff7484',shape:'circle',text:t.pnl>=0?'Win':'Loss'}]);if(s.position)rows.push({time:projection.bucket(s.position.entryTime),position:'belowBar',color:'#4385ff',shape:'arrowUp',text:s.position.side==='long'?'Buy':'Sell'});markers.setMarkers(rows.sort((a,b)=>a.time-b.time));}
-    previous=s.cursor;sessionId=identity;visible=barsVisible;onCrosshair(bars.at(-1));repaint();
+    sessionId=identity;visible=barsVisible;onCrosshair(bars.at(-1));repaint();
    },
    tool(value){if(value!=='cursor'&&!Suite.available(value,current?.candles.slice(0,current.cursor+1)||[])){callbacks.onError?.('This tool requires real volume data in the selected history.');return false;}tool=value;pending=[];freehand=null;first=null;hover=null;selected=null;suppressClick=false;callbacks.onSelect?.(null);repaint();return true;},
    keep(value){keepMode=!!value;return keepMode;},
