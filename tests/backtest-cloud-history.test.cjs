@@ -7,6 +7,15 @@ function fixture(month,count=744){
  return {blob:new Blob([bytes]),meta:{provider:'histdata',symbol:'EURUSD',timeframe:'H1',month:month+'-01',sha256,object_path:`histdata/EURUSD/H1/${month}/${sha256}.json.gz`,candle_count:count,first_utc:new Date(first*1000).toISOString(),last_utc:new Date(rows.at(-1)[0]*1000).toISOString(),bytes:bytes.length},rows};
 }
 function client(fixtures){const downloads=[],calls=[];return {downloads,calls,async rpc(name,args){calls.push({name,args});if(name==='history_catalog'){const groups=new Map();for(const f of fixtures){const r=f.meta,key=[r.provider,r.symbol,r.timeframe].join(':');let group=groups.get(key);if(!group){group={provider:r.provider,symbol:r.symbol,timeframe:r.timeframe,first_utc:r.first_utc,last_utc:r.last_utc,candle_count:0};groups.set(key,group);}group.first_utc=group.first_utc<r.first_utc?group.first_utc:r.first_utc;group.last_utc=group.last_utc>r.last_utc?group.last_utc:r.last_utc;group.candle_count+=r.candle_count;}return {data:[...groups.values()],error:null};}if(name==='history_months')return {data:fixtures.map(f=>f.meta).filter(r=>r.provider===args.source_provider&&r.symbol===args.source_symbol&&r.timeframe===args.source_timeframe),error:null};assert.equal(name,'history_read_payload');downloads.push(args.object_key);const f=fixtures.find(f=>f.meta.object_path===args.object_key);return {data:f?Buffer.from(await f.blob.arrayBuffer()).toString('base64'):null,error:null};}};}
+test('full monthly minute chunks validate beyond 10,000 rows while replay windows stay bounded',async()=>{
+ const first=Date.parse('2026-10-01T00:00:00Z')/1000;
+ const rows=Array.from({length:22000},(_,i)=>[first+i*60,'1.10000','1.20000','1.00000','1.15000']);
+ function make(){const bytes=gzipSync(JSON.stringify({schema:1,provider:'histdata',symbol:'EURUSD',timeframe:'M1',timezone:'UTC',price_side:'bid',columns:['time','open','high','low','close'],candles:rows})),sha256=createHash('sha256').update(bytes).digest('hex');return {blob:new Blob([bytes]),meta:{provider:'histdata',symbol:'EURUSD',timeframe:'M1',month:'2026-10-01',sha256,object_path:`histdata/EURUSD/M1/2026-10/${sha256}.json.gz`,candle_count:rows.length,first_utc:new Date(first*1000).toISOString(),last_utc:new Date(rows.at(-1)[0]*1000).toISOString(),bytes:bytes.length}};}
+ const f=make();assert.equal((await unpack(f.blob,f.meta)).length,22000);
+ const h=new History(client([f]));await h.catalog();const window=await h.load('histdata:EURUSD:M1');assert.equal(window.interval,'1m');assert.equal(window.candles.length,5000);
+ rows[21000][2]='0.5';const bad=make();await assert.rejects(unpack(bad.blob,bad.meta),/OHLC/);
+});
+
 test('verified chunks provide earlier context and bounded forward candles',async()=>{
  const jan=fixture('2025-01'),feb=fixture('2025-02',672),c=client([jan,feb]),h=new History(c),catalog=await h.catalog();assert.equal(catalog.length,1);
  const result=await h.load(catalog[0].id,{start:'2025-02-01T00:00',limit:120});assert.equal(result.candles.length,120);assert.equal(result.candles[100].t,feb.rows[0][0]);assert.equal(c.downloads.length,2);assert.equal(result.versions.length,2);assert.equal(result.interval,'1H');

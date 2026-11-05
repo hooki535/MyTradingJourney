@@ -1,6 +1,7 @@
 /* UTC chart aggregation. Only the revealed source prefix enters a display candle. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.BacktestFrames=api;})(typeof window==='object'?window:globalThis,function(){
  'use strict';
+ const coarseContexts=new WeakMap();
  const contexts=new WeakMap(),market=s=>s.markets?s.markets.find(m=>m.symbol===s.activeSymbol):s;
  function context(s){return contexts.get(market(s))||[];}
  function setContext(s,bars){
@@ -9,6 +10,19 @@
   const checked=bars.map(b=>{if(!Number.isInteger(b.t)||b.t<=previous||b.t>=target.candles[0].t||![b.o,b.h,b.l,b.c].every(Number.isFinite)||!(b.l>0&&b.l<=Math.min(b.o,b.c)&&b.h>=Math.max(b.o,b.c)))throw Error('Chart context must contain ordered candles before the saved dataset.');previous=b.t;return {...b};});
   contexts.set(target,checked);
  }
+ function setCoarseContext(s,step,bars){
+  const target=market(s),cut=Math.floor(target.candles[0].t/step)*step;
+  if(![3600,86400].includes(step)||!Array.isArray(bars)||bars.length>10000)throw Error('Invalid coarse history context.');
+  let previous=-Infinity;
+  const checked=bars.map(b=>{if(!Number.isInteger(b.t)||b.t<=previous||b.t+step>cut||![b.o,b.h,b.l,b.c].every(Number.isFinite)||!(b.l>0&&b.l<=Math.min(b.o,b.c)&&b.h>=Math.max(b.o,b.c)))throw Error('Coarse history must be closed before the saved minute dataset.');previous=b.t;return {...b};});
+  let group=coarseContexts.get(target);if(!group){group=new Map();coarseContexts.set(target,group);}group.set(step,checked);
+ }
+ function earlierFor(s,key){
+  const target=market(s),n=seconds(key),step=n>=86400?86400:n>=3600?3600:0,coarse=coarseContexts.get(target)?.get(step);
+  if(!coarse?.length||step<base(s))return context(s);
+  const cut=Math.floor(target.candles[0].t/step)*step;
+  return [...coarse,...context(s).filter(b=>b.t>=cut)];
+ }
  const choices=[['1m',60],['3m',180],['5m',300],['15m',900],['30m',1800],['45m',2700],['1H',3600],['2H',7200],['3H',10800],['4H',14400],['6H',21600],['8H',28800],['12H',43200],['1D',86400],['1W',604800],['1M',2678400]];
  function seconds(label){const match=choices.find(([key])=>key.toLowerCase()===String(label).toLowerCase()&&!(key==='1M'&&label==='1m'));return label==='1M'?2678400:match?.[1];}
  function base(s){const value=seconds(s.interval);if(value)return value;const gaps=s.candles.slice(1,100).map((b,i)=>b.t-s.candles[i].t).sort((a,b)=>a-b);return gaps[Math.floor(gaps.length/2)]||60;}
@@ -16,7 +30,7 @@
  function selected(s){return available(s,s.viewTimeframe)?s.viewTimeframe:choices.find(([,n])=>n===base(s))?.[0]||'source';}
  function bucket(t,key){if(key==='1M'){const d=new Date(t*1000);return Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),1)/1000;}const n=seconds(key);if(!n)return t;const offset=key==='1W'?345600:0;return Math.floor((t-offset)/n)*n+offset;}
  function project(s,key=selected(s)){
-  const earlier=context(s),offset=earlier.length,source=[...earlier,...s.candles.slice(0,s.cursor+1)];
+  const earlier=earlierFor(s,key),offset=earlier.length,source=[...earlier,...s.candles.slice(0,s.cursor+1)];
   if(!available(s,key)||seconds(key)===base(s))return {bars:source,toDisplay:i=>i+offset,toBase:i=>i-offset,bucket:t=>t};
   const bars=[],starts=[];
   for(let j=0;j<source.length;j++){const i=j-offset,b=source[j],t=bucket(b.t,key),last=bars.at(-1);if(last?.t===t){last.h=Math.max(last.h,b.h);last.l=Math.min(last.l,b.l);last.c=b.c;if(Number.isFinite(last.v)&&Number.isFinite(b.v))last.v+=b.v;else delete last.v;}else{starts.push(i);bars.push({...b,t});}}
@@ -44,7 +58,7 @@
   function count(frame){return project(s,frame).bars.length;}
   const candles=count(key),candidates=choices.filter(([frame,n])=>available(s,frame)&&n<(seconds(key)||base(s))).reverse();
   const recommended=candles<30?(candidates.find(([frame])=>count(frame)>=30)?.[0]||null):null;
-  return {candles,recommended,first:context(s)[0]?.t||s.candles[0].t,revealed:s.candles[s.cursor].t,last:s.candles.at(-1).t};
+  return {candles,recommended,first:project(s,key).bars[0]?.t||s.candles[0].t,revealed:s.candles[s.cursor].t,last:s.candles.at(-1).t};
  }
- return {choices,seconds,base,available,selected,bucket,project,historyStart,replayStart,coverage,context,setContext};
+ return {choices,seconds,base,available,selected,bucket,project,historyStart,replayStart,coverage,context,setContext,setCoarseContext};
 });

@@ -19,7 +19,9 @@
   const data=JSON.parse(await new Blob(parts).text());
   if(data.schema!==1||data.provider!==meta.provider||data.symbol!==meta.symbol||data.timeframe!==meta.timeframe||data.timezone!=='UTC'||data.price_side!=='bid'||!Array.isArray(data.candles)||data.candles.length!==meta.candle_count||JSON.stringify(data.columns)!=='["time","open","high","low","close"]')throw Error('Unexpected cloud history format or instrument.');
   let previous=-1;const rows=data.candles.map(row=>{if(!Array.isArray(row)||row.length!==5||!Number.isInteger(row[0])||row[0]<=previous)throw Error('Cloud candles are not ordered.');previous=row[0];return {t:row[0],o:Number(row[1]),h:Number(row[2]),l:Number(row[3]),c:Number(row[4])};});
-  const bars=E.validateBars(rows,1);
+  // Monthly M1 chunks exceed the session's 10,000-candle limit. Validate every
+  // row in bounded batches; the replay loader still selects at most 10,000.
+  const bars=[];for(let from=0;from<rows.length;from+=10000)bars.push(...E.validateBars(rows.slice(from,from+10000),1));
   if(bars[0].t!==Date.parse(meta.first_utc)/1000||bars.at(-1).t!==Date.parse(meta.last_utc)/1000)throw Error('Cloud candle dates do not match their catalog.');
   return bars;
  }
