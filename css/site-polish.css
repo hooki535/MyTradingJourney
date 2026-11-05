@@ -16,3 +16,5 @@
 @media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}.ref-site .ref-feature-image img{transition:none}.ref-site .ref-feature:hover .ref-feature-image img{transform:none}}
 
 .site-search-summary{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0 20px;color:var(--mj-muted,#687164);font-size:12px}.empty-books h3{font:24px Georgia,serif}.empty-books .learn-button{margin-top:8px}
+
+.journey-top,.learn-top{gap:18px}.journey-top .workspace-header-home,.learn-top>a{margin-left:auto}.journey-top .site-finder-button,.learn-top .site-finder-button{margin-left:0}.access-header{gap:18px;flex-wrap:wrap}
