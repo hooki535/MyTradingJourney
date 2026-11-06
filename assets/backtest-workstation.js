@@ -29,11 +29,11 @@
    ctx.toast((side==='long'?'Buy':'Sell')+' '+fields.type.value+' ticket prepared. Set your stop, target and size, then place the order.');
   }
   const top=document.createElement('div');top.className='bt-workstation-bar';top.innerHTML='<div class="bt-timeframe-favorites" role="group" aria-label="Favorite chart timeframes"></div><button id="bt-timeframe-pin" type="button" aria-label="Customize favorite timeframes" title="Customize favorite timeframes">'+I.svg('star')+'</button><span class="bt-workstation-divider"></span><button type="button" id="bt-command-open" title="Search chart commands · Ctrl / Cmd + K">'+I.svg('search')+'<span>Quick actions</span><kbd>Ctrl K</kbd></button><span class="bt-workstation-spacer"></span><button type="button" id="bt-fit-chart" title="Fit revealed history">'+I.svg('fullscreen')+'<span>Fit</span></button><button type="button" id="bt-latest-chart" title="Return to the replay candle">'+I.svg('go')+'<span>Replay candle</span></button>';
-  $('.bt-chart-toolbar').after(top);
-  const studyBar=document.createElement('div');studyBar.className='bt-workstation-studies';studyBar.setAttribute('aria-label','Active chart indicators');top.after(studyBar);
+  const tools=document.querySelector('.bt-desk-extras');if(tools)tools.append(top);else $('.bt-chart-toolbar').after(top);
+  const studyBar=document.createElement('div');studyBar.className='bt-workstation-studies';studyBar.setAttribute('aria-label','Active chart indicators');$('.bt-history-strip').after(studyBar);
   const strip=document.createElement('div');strip.className='bt-workstation-replay';strip.innerHTML='<div class="bt-replay-clock"><span class="bt-replay-dot"></span><b id="bt-workstation-clock"></b><small>UTC · historical replay</small></div><div class="bt-replay-progress"><progress id="bt-workstation-progress" aria-label="Replay progress"></progress><span id="bt-workstation-percent"></span></div><button type="button" id="bt-quick-day" title="Process every candle until the next UTC day">Next day '+I.svg('step')+'</button><button type="button" id="bt-quick-session" title="Skip to the next London, New York or Tokyo opening">Next session '+I.svg('go')+'</button>';
   $('.bt-chart-time').before(strip);
-  const review=document.createElement('section');review.className='bt-workstation-review';review.setAttribute('aria-label','Trade review queue');terminal.after(review);
+  const review=document.createElement('section');review.className='bt-workstation-review';review.setAttribute('aria-label','Trade review queue');$('#bt-trade-table').after(review);
   function jump(name){click('#bt-go');$('#bt-dialog [data-replay-jump="'+name+'"]')?.click();}
   $('#bt-quick-day').onclick=()=>jump('day');$('#bt-quick-session').onclick=()=>jump('session');
   $('#bt-fit-chart').onclick=()=>ctx.chart.fit();$('#bt-latest-chart').onclick=()=>ctx.chart.latest();

@@ -13,8 +13,16 @@
  }
  function replay(){
   clear();const terminal=$('#bt-terminal'),bar=$('.bt-pro-replay'),heading=$('.bt-session-heading');if(!terminal||!bar||!heading)return;
-  // The playback bar sits above the plot, so its draggable surface never covers candles.
-  const dock=document.createElement('div');dock.className='bt-reference-playback';bar.before(dock);heading.querySelector('.bt-session-name').after(dock);dock.append(bar);bar.classList.remove('is-floating');bar.style.removeProperty('left');bar.style.removeProperty('top');
+  // Keep the existing draggable playback controls over the plot, as in the reference.
+  bar.classList.add('is-floating');bar.style.left='55px';bar.style.top='48px';
+  const extras=document.createElement('details');extras.className='bt-desk-extras';extras.innerHTML='<summary>Research & chart tools</summary>';terminal.before(extras);
+  const brief=$('#bt-research-summary');if(brief)extras.append(brief);
+  const headingActions=heading.querySelector(':scope > .bt-actions');for(const node of headingActions?.querySelectorAll('[data-research],#bt-rules')||[])extras.append(node);
+  const stats=$('#bt-live-stats');if(stats)heading.querySelector('.bt-session-name').after(stats);
+  const extraActions=document.createElement('div');extraActions.className='bt-actions bt-desk-extra-actions';extras.append(extraActions);for(const selector of ['#bt-open-journal','#bt-replay-focus','#bt-compare-toggle','.bt-chart-tool-extras']){const node=$(selector);if(node)extraActions.append(node);}
+  for(const selector of ['#bt-settings','#bt-fullscreen','#bt-objects','#bt-camera']){const node=$(selector);if(node){node.classList.add('bt-reference-icon');node.title=node.getAttribute('aria-label')||node.textContent.trim();}}
+  
+  $('#bt-toggle-order').innerHTML=window.BacktestIcons.label('order','Place order');
   const floating=$('#bt-replay-float');if(floating)floating.title='Dock replay below the chart or float it over the chart';
   const presets=$('.bt-pro-presets');if(presets)presets.open=false;
   $('#bt-toggle-order')?.setAttribute('aria-controls','bt-ticket');
