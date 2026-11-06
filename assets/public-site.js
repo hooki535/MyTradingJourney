@@ -25,6 +25,5 @@
  $('print-note').addEventListener('click',()=>window.print());$('copy-note').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);$('note-share-status').textContent='Article link copied.';}catch(_){$('note-share-status').textContent='Copy the link from your address bar to share this field note.';}});
  }
  if($('all-field-notes')){$('notes-search').addEventListener('input',collection);$('notes-topic').addEventListener('change',collection);document.querySelector('.notes-tools').addEventListener('submit',event=>event.preventDefault());collection();const slug=new URLSearchParams(location.search).get('note');if(slug)article(notes.find(n=>n.slug===slug));}
- // Progressive enhancement: visible content stays visible without JS or intersection support.
- if('IntersectionObserver' in window&&!matchMedia('(prefers-reduced-motion: reduce)').matches){const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target);}},{threshold:.08});for(const node of document.querySelectorAll('.ref-about,.ref-feature,.ref-note-card,.ref-faq')){node.classList.add('ref-reveal-ready');observer.observe(node);}}
+ // Sections remain visible during fast scrolling and when browser observers are delayed.
 })();

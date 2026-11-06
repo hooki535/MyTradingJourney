@@ -24,3 +24,28 @@
 .site-lab-banner nav{position:static;inset:auto;box-shadow:none}
 @media(max-width:760px){.ref-site .ref-header{gap:10px}.ref-site .ref-hero-visual{height:390px}}
 @media(max-width:420px){.ref-header .brand{font-size:13px;gap:8px}.ref-header .brand small{display:none}.ref-header .monogram{width:30px;height:34px}.ref-header .menu-toggle{padding:8px;gap:6px}.ref-header .site-finder-button{min-width:32px;padding:5px}}
+
+/* Public home: calmer proportions and one clear invitation into the workspace. */
+.ref-site section[id]{scroll-margin-top:110px}
+.ref-site .ref-header #main-nav{margin-left:auto}
+.ref-header .site-finder-button{margin-left:0;flex-shrink:0;min-width:40px;min-height:40px}
+.ref-header .site-finder-button svg{display:block;flex-shrink:0}
+.ref-site .ref-hero-copy h1{font-size:clamp(42px,4.6vw,67px);line-height:1.08;letter-spacing:-2.2px}
+.ref-site .ref-hero{padding-block:48px 58px;gap:5%}
+.ref-site .ref-hero-visual{height:465px;margin-bottom:0}
+.ref-site .ref-hero-visual>img{min-height:0}
+.ref-site .hero-note{right:18px;left:18px;bottom:20px;width:auto;padding:22px 25px}
+.ref-site .hero-note p{font-size:27px}
+.ref-site .ref-hero-meta{margin-top:28px;padding-top:18px}
+.site-workspace-invitation{display:grid;grid-template-columns:1.1fr 1fr;gap:8%;padding-block:65px;border-bottom:1px solid #dce3dc}
+.site-workspace-invitation h2{font:normal clamp(32px,3.6vw,48px)/1.12 Georgia,serif;letter-spacing:-1px;margin:0 0 20px}
+.site-workspace-invitation h2 em{color:#38754f}
+.site-workspace-invitation>div>p:not(.eyebrow){font-size:14px;line-height:1.85;color:#5c675e;max-width:480px;margin:0 0 24px}
+.site-workspace-invitation ul{list-style:none;padding:0;margin:0;align-self:center}
+.site-workspace-invitation li{display:flex;gap:20px;padding:24px 0;border-bottom:1px solid #dce3dc}
+.site-workspace-invitation li:first-child{border-top:1px solid #dce3dc}
+.site-workspace-invitation li>span{font-size:11px;color:#38754f;padding-top:5px}
+.site-workspace-invitation h3{font:normal 25px Georgia,serif;margin:0 0 8px}
+.site-workspace-invitation li p{font-size:13px;line-height:1.7;color:#5c675e;margin:0}
+@media(max-width:950px){.ref-site .ref-header #main-nav{margin-left:0}.ref-site .ref-header .menu-toggle{margin-left:auto}.ref-site section[id]{scroll-margin-top:95px}}
+@media(max-width:700px){.ref-site .ref-hero{padding-block:32px 38px}.ref-site .ref-hero-copy h1{font-size:clamp(38px,9vw,58px);letter-spacing:-1.5px}.ref-site .ref-hero-visual{height:350px;margin-left:0}.ref-site .hero-note{left:14px;right:14px;bottom:14px;padding:18px}.ref-site .hero-note p{font-size:25px}.site-workspace-invitation{grid-template-columns:1fr;gap:25px;padding-block:40px}.site-workspace-invitation li{padding:20px 0}.site-section-nav{font-size:11px}.site-section-nav a{padding:8px 10px}}
