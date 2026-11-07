@@ -81,3 +81,18 @@
 @media(max-width:760px){.bt-chart-stage{height:var(--bt-chart-height,580px)}.bt-drawing-rail .bt-draw-button,.bt-drawing-rail .bt-tv-split{height:30px;min-height:30px}}
 .bt-tv-menu .bt-tv-menu-row{height:34px}.bt-tv-menu .bt-tv-menu-row>button:first-child{height:34px;min-height:34px;padding:5px 8px}
 .bt-chart-stage>.bt-drawing-rail{gap:0;padding-top:4px;padding-bottom:4px}.bt-drawing-rail .bt-draw-button,.bt-drawing-rail .bt-tv-split{height:30px;min-height:30px}
+
+/* TradingView-style drawing interaction feedback */
+.bt-drawing-layer.bt-drawing-mode{cursor:crosshair}
+.bt-drawing-layer .bt-annotation{cursor:pointer}
+.bt-drawing-layer .bt-annotation.bt-selected{cursor:move}
+.bt-drawing-layer .bt-annotation.bt-locked{cursor:not-allowed}
+.bt-drawing-layer.bt-dragging,.bt-drawing-layer.bt-dragging *{cursor:grabbing!important}
+.bt-drawing-layer .bt-annotation:hover:not(.bt-selected) :is(line,path,polyline,rect,ellipse,polygon){filter:drop-shadow(0 0 2px rgba(41,98,255,.55))}
+.bt-drawing-layer .bt-handle{filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));transition:r .08s ease}
+.bt-drawing-layer .bt-handle:hover{r:7}
+.bt-drawing-layer .bt-draw-preview{opacity:.75}
+
+/* Floating mini toolbar that follows the selected drawing */
+.bt-drawing-edit.bt-floating-edit{border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.45);transition:left .06s linear,top .06s linear}
+.bt-drawing-edit.bt-floating-edit button:hover,.bt-drawing-edit.bt-floating-edit select:hover{background:#2a2e39}
