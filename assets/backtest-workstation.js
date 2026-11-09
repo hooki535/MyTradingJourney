@@ -3,7 +3,7 @@
  'use strict';
  const frames=['1m','5m','15m','30m','1H','2H','4H','1D','1W','1M'];
  const preferenceKey='onepercent:backtest-workstation:v1';
- function preferences(raw={}){return {frames:Array.isArray(raw?.frames)?[...new Set(raw.frames.filter(x=>frames.includes(x)))].slice(0,10):['1m','5m','15m','1H','4H','1D']};}
+ function preferences(raw={}){return {...(raw?.chart&&typeof raw.chart==='object'?{chart:raw.chart}:{}),frames:Array.isArray(raw?.frames)?[...new Set(raw.frames.filter(x=>frames.includes(x)))].slice(0,10):['1m','5m','15m','1H','4H','1D']};}
  function pendingType(side,entry,last){if(!['long','short'].includes(side)||![entry,last].every(x=>Number.isFinite(x)&&x>0))throw Error('Choose a valid side and price.');if(entry===last)throw Error('Choose a price above or below the current close, or use a market order.');return side==='long'?(entry<last?'limit':'stop'):(entry>last?'limit':'stop');}
  function search(rows,query){const words=String(query||'').toLowerCase().trim().split(/\s+/).filter(Boolean);return rows.filter(row=>words.every(w=>(row.label+' '+row.group+' '+(row.keywords||'')).toLowerCase().includes(w)));}
  function reviewed(review){return !!review&&['thesis','execution','lesson','notes','followed'].some(k=>typeof review[k]==='string'&&review[k].trim());}
@@ -18,6 +18,14 @@
   const price=n=>Number(n.toPrecision(8)).toString();
   function frame(value){const select=$('#bt-timeframe'),option=[...select.options].find(o=>o.value===value);if(!option||option.disabled)return;select.value=value;select.dispatchEvent(new Event('change'));refresh();}
   function click(selector){$(selector)?.click();}
+  ctx.chart.configure(prefs.chart);
+  const navigation=document.createElement('div');navigation.className='bt-terminal-navigation';navigation.setAttribute('role','group');navigation.setAttribute('aria-label','Chart navigation and appearance');
+  navigation.innerHTML='<button type="button" data-chart-pan="-.2" title="Pan toward earlier candles" aria-label="Pan toward earlier candles">←</button><button type="button" data-chart-pan=".2" title="Pan toward later candles" aria-label="Pan toward later candles">→</button><button type="button" data-chart-reset title="Reset zoom and restore automatic price scale">Reset view</button><button type="button" data-chart-display>Chart appearance</button>';
+  $('.bt-chart-time').append(navigation);
+  navigation.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.chartPan)ctx.chart.pan(Number(b.dataset.chartPan));else if(b.hasAttribute('data-chart-reset')){document.querySelector('[data-draw-tool="cursor"]')?.click();ctx.chart.reset();prefs.chart=ctx.chart.configure();save();}else if(b.hasAttribute('data-chart-display')){
+   const v=ctx.chart.configure();ctx.modal('Chart appearance','<form id="bt-chart-appearance"><p class="bt-pro-help">Display preferences change the chart only. Historical prices and replay stay unchanged.</p>'+[['grid','Show grid'],['priceLine','Show current price line'],['auto','Automatic price scale'],['log','Logarithmic price scale']].map(([key,label])=>'<label class="bt-setting-check"><input type="checkbox" name="'+key+'" '+(v[key]?'checked':'')+'> '+label+'</label>').join('')+'<label class="bt-field"><span>Crosshair line style</span><select name="crosshairStyle" class="bt-select">'+['solid','dotted','dashed'].map(k=>'<option '+(v.crosshairStyle===k?'selected':'')+'>'+k+'</option>').join('')+'</select></label>'+[['upColor','Rising candles','#26a69a'],['downColor','Falling candles','#ef5350'],['bgColor','Chart background','#15171c']].map(([key,label,fallback])=>'<label class="bt-field"><span>'+label+'</span><input type="color" name="'+key+'" value="'+(v[key]||fallback)+'"></label>').join('')+'<div class="bt-actions"><button type="button" class="bt-button" id="bt-chart-defaults">Restore defaults</button><button type="submit" class="bt-button primary">Apply</button></div></form>');
+   const form=$('#bt-chart-appearance');$('#bt-chart-defaults').onclick=()=>{prefs.chart=ctx.chart.configure({grid:true,priceLine:true,auto:true,log:false,crosshairStyle:'dashed',upColor:'',downColor:'',bgColor:''});save();$('#bt-dialog').close();};form.onsubmit=event=>{event.preventDefault();const fields=form.elements,next={};for(const key of ['grid','priceLine','auto','log'])next[key]=fields[key].checked;for(const key of ['crosshairStyle','upColor','downColor','bgColor'])next[key]=fields[key].value;prefs.chart=ctx.chart.configure(next);save();$('#bt-dialog').close();};
+  }};
   function prepare(side,entry){
    ctx.pause();ctx.panel('order');const form=$('#bt-order-form'),fields=form.elements,last=s.candles[s.cursor].c;
    fields.side.value=side;fields.side.dispatchEvent(new Event('change',{bubbles:true}));
@@ -37,7 +45,7 @@
   function jump(name){click('#bt-go');$('#bt-dialog [data-replay-jump="'+name+'"]')?.click();}
   $('#bt-quick-day').onclick=()=>jump('day');$('#bt-quick-session').onclick=()=>jump('session');
   $('#bt-fit-chart').onclick=()=>ctx.chart.fit();$('#bt-latest-chart').onclick=()=>ctx.chart.latest();
-  $('#bt-timeframe-pin').onclick=()=>{ctx.pause();ctx.modal('Favorite timeframes','<p class="bt-pro-help">Pinned intervals stay one click away. Unavailable intervals require finer source data.</p><div class="bt-frame-picker">'+frames.map(f=>'<label><input type="checkbox" value="'+f+'" '+(prefs.frames.includes(f)?'checked':'')+'><span>'+f+'</span></label>').join('')+'</div><div class="bt-actions"><button type="button" class="bt-button" id="bt-frame-defaults">Reset favorites</button><button type="button" class="bt-button primary" id="bt-frame-save">Save favorites</button></div>');$('#bt-frame-defaults').onclick=()=>{for(const input of document.querySelectorAll('.bt-frame-picker input'))input.checked=preferences().frames.includes(input.value);};$('#bt-frame-save').onclick=()=>{prefs=preferences({frames:[...document.querySelectorAll('.bt-frame-picker input:checked')].map(x=>x.value)});save();$('#bt-dialog').close();refresh();};};
+  $('#bt-timeframe-pin').onclick=()=>{ctx.pause();ctx.modal('Favorite timeframes','<p class="bt-pro-help">Pinned intervals stay one click away. Unavailable intervals require finer source data.</p><div class="bt-frame-picker">'+frames.map(f=>'<label><input type="checkbox" value="'+f+'" '+(prefs.frames.includes(f)?'checked':'')+'><span>'+f+'</span></label>').join('')+'</div><div class="bt-actions"><button type="button" class="bt-button" id="bt-frame-defaults">Reset favorites</button><button type="button" class="bt-button primary" id="bt-frame-save">Save favorites</button></div>');$('#bt-frame-defaults').onclick=()=>{for(const input of document.querySelectorAll('.bt-frame-picker input'))input.checked=preferences().frames.includes(input.value);};$('#bt-frame-save').onclick=()=>{prefs=preferences({...prefs,frames:[...document.querySelectorAll('.bt-frame-picker input:checked')].map(x=>x.value)});save();$('#bt-dialog').close();refresh();};};
   function commands(){
    const rows=[
     {id:'order-buy',label:'Prepare buy market order',group:'Trading',icon:'long',run:()=>prepare('long')},
@@ -86,7 +94,9 @@
    if(!menu.hidden){if(['Escape','Tab'].includes(e.key)){closeMenu(e.key==='Escape');if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();}return;}if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();e.stopImmediatePropagation();const items=[...menu.querySelectorAll('button')],i=items.indexOf(document.activeElement);items[e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();return;}if(e.code==='Space'||e.code==='ArrowRight'){e.stopImmediatePropagation();}}
    if((e.ctrlKey||e.metaKey)&&!e.altKey&&e.key.toLowerCase()==='k'&&!$('#bt-dialog').open){e.preventDefault();e.stopImmediatePropagation();palette();}
   },{capture:true,signal:signal.signal});
+  let terminalLayout=null;
   function refresh(){
+   terminalLayout?.refresh();
    if(disposed||!top.isConnected)return;
    const selected=F.selected(s),favorites=top.querySelector('.bt-timeframe-favorites'),favoriteHTML=prefs.frames.map(f=>'<button type="button" data-pinned-frame="'+f+'" '+(F.available(s,f)?'':'disabled')+' aria-pressed="'+(selected===f)+'" title="'+f+(F.available(s,f)?' chart':' · requires finer source data')+'">'+f+'</button>').join('');
    if(favorites.innerHTML!==favoriteHTML)favorites.innerHTML=favoriteHTML;favorites.onclick=e=>{const b=e.target.closest('[data-pinned-frame]');if(b&&!b.disabled)frame(b.dataset.pinnedFrame);};
@@ -98,8 +108,9 @@
    review.innerHTML='<div><small>REVIEW & REFINE</small><b>'+(!s.trades.length?'Your next lesson starts with a trade':pending.length?pending.length+' '+(pending.length===1?'exit needs':'exits need')+' a review':'Every exit reviewed')+'</b><span>'+(!s.trades.length?'Capture your plan in the session journal.':'Record execution, emotion and the lesson to carry forward.')+'</span></div><div class="bt-review-queue-actions">'+pending.slice(-3).reverse().map(({t,index})=>'<button type="button" data-workstation-review="'+index+'">'+esc(t.symbol||s.symbol)+' · '+esc(t.side)+'<span class="'+(t.pnl>=0?'bt-up':'bt-down')+'">'+new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(t.pnl)+'</span>'+I.svg('journal')+'</button>').join('')+'<button type="button" data-workstation-journal>'+I.svg('journal')+'Open journal</button></div>';
    review.onclick=e=>{const b=e.target.closest('[data-workstation-review]');if(b){ctx.pause();ctx.review(Number(b.dataset.workstationReview));}else if(e.target.closest('[data-workstation-journal]'))click('#bt-open-journal');};
   }
+  terminalLayout=window.BacktestTerminalLayout?.mount(s,{...ctx,prepare});
   refresh();
-  return {refresh,palette,destroy(){disposed=true;paletteCleanup?.();signal.abort();closeMenu();for(const n of [top,studyBar,strip,review,menu])n.remove();}};
+  return {refresh,palette,destroy(){terminalLayout?.destroy();disposed=true;paletteCleanup?.();signal.abort();closeMenu();for(const n of [top,studyBar,strip,review,menu,navigation])n.remove();}};
  }
  return {frames,preferences,pendingType,search,reviewed,progress,mount};
 });

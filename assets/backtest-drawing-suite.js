@@ -25,13 +25,13 @@
  function spec(id){return specs.get(id);}
  function validate(a){const d=spec(a?.type);if(!d||!Array.isArray(a.points)||a.points.length<2||a.points.length>400)return false;const n=d.points;return (!n||a.points.length===Math.max(2,n)||(legacy.has(a.type)&&a.points.length===2))&&a.points.every(p=>Number.isFinite(p.i)&&Math.abs(p.i)<1e8&&Number.isFinite(p.p)&&p.p>0);}
  function available(id,bars){return spec(id)?.requires!=='volume'||(bars.length>0&&bars.every(b=>Number.isFinite(b.v)&&b.v>=0)&&bars.some(b=>b.v>0));}
- function positionDraft(type,entry,{bars=[],toDisplay=i=>i,toBase=i=>i}={}){
-  const rows=bars.slice(-20),average=rows.length?rows.reduce((n,b)=>n+b.h-b.l,0)/rows.length:0,distance=Math.min(entry.p*.25,Math.max(entry.p*.001,average*1.5)),direction=type==='short'?-1:1;
-  return {type,points:[{...entry},{i:toBase(toDisplay(entry.i)+15),p:entry.p-direction*distance}],target:entry.p+direction*distance*2};
+ function positionDraft(type,entry,{bars=[],toDisplay=i=>i,toBase=i=>i,distance:requestedDistance,span=15}={}){
+  const rows=bars.slice(-20),average=rows.length?rows.reduce((n,b)=>n+b.h-b.l,0)/rows.length:0,distance=Number.isFinite(requestedDistance)&&requestedDistance>0?Math.min(entry.p*.25,requestedDistance):Math.min(entry.p*.25,Math.max(entry.p*.001,average*1.5)),direction=type==='short'?-1:1;
+  return {type,points:[{...entry},{i:toBase(toDisplay(entry.i)+span),p:entry.p-direction*distance}],target:entry.p+direction*distance};
  }
  function positionStats(a){
-  const settings=a.settings||{},entry=a.points[0].p,stop=a.points[1].p,target=a.target??entry+(a.type==='long'?1:-1)*2*Math.abs(entry-stop),risk=Math.abs(entry-stop),reward=Math.abs(target-entry),cash=(settings.accountSize??10000)*(settings.riskPct??1)/100,pointValue=settings.pointValue??1,lotSize=settings.lotSize??1,precision=settings.qtyPrecision??4,scale=10**precision,quantity=risk>0?Math.floor(cash/(risk*pointValue*lotSize)*scale)/scale:0;
-  return {entry,stop,target,risk,reward,ratio:risk?reward/risk:0,quantity,riskCash:quantity*lotSize*risk*pointValue,rewardCash:quantity*lotSize*reward*pointValue};
+  const settings=a.settings||{},entry=a.points[0].p,stop=a.points[1].p,target=a.target??entry+(a.type==='long'?1:-1)*2*Math.abs(entry-stop),risk=Number(Math.abs(entry-stop).toPrecision(10)),reward=Number(Math.abs(target-entry).toPrecision(10)),cash=(settings.accountSize??10000)*(settings.riskPct??1)/100,pointValue=settings.pointValue??1,lotSize=settings.lotSize??1,precision=settings.qtyPrecision??4,scale=10**precision,quantity=risk>0?Math.floor(cash/(risk*pointValue*lotSize)*scale*(1+Number.EPSILON*4))/scale:0;
+  return {entry,stop,target,risk,reward,ratio:risk?reward/risk:0,quantity,riskCash:Number((quantity*lotSize*risk*pointValue).toPrecision(14)),rewardCash:Number((quantity*lotSize*reward*pointValue).toPrecision(14))};
  }
  function geometry(a,ctx){
   const d=spec(a.type);if(!d)return null;if(legacy.has(a.type)&&!(a.type==='triangle'&&a.points.length===3)&&!(a.type==='text'&&a.settings))return null;

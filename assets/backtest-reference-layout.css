@@ -71,3 +71,7 @@ body[data-page=backtesting] .bt-desk-extra-actions .bt-button{padding:7px 12px;b
 .bt-reference-filter-menu .bt-inline-filters>label{background:var(--bt-soft);padding:10px 12px;gap:7px}
 html[data-theme] body[data-page=backtesting][data-backtest-design=goat] .bt-filters>#bt-search{flex:1 1 180px;width:auto;max-width:420px}
 @media(max-width:760px){html[data-theme] body[data-page=backtesting][data-backtest-design=goat] .bt-filters>#bt-search{flex:1 1 150px}.bt-reference-filter-menu .bt-inline-filters{left:auto;right:0;min-width:min(240px,calc(100vw - 40px))}}
+
+body.bt-replaying .bt-drawing-edit{top:8px!important;right:8px!important}
+
+.bt-terminal-navigation{display:flex;align-items:center;gap:4px;flex-wrap:wrap}.bt-terminal-navigation button{background:transparent;border:1px solid var(--bt-line,#30333b);color:var(--bt-muted,#b2b5be);border-radius:4px;padding:5px 8px;cursor:pointer;font:inherit}.bt-terminal-navigation button:hover,.bt-terminal-navigation button:focus-visible{color:var(--bt-text,#fff);background:var(--bt-card,#20232b)}.bt-chart-time{flex-wrap:wrap;gap:8px}#bt-chart-appearance{display:grid;gap:12px}#bt-chart-appearance input[type=color]{width:60px;height:30px}

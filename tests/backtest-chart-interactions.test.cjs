@@ -1,15 +1,15 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const Frames=require('../assets/backtest-frames.js');
 function harness(){
- let range=null,clobber=false;const series=[];
+ let range=null,clobber=false;const series=[],applied=[],scales=[];
  const ts={getVisibleLogicalRange:()=>range&&({...range}),setVisibleLogicalRange:r=>{range={...r};},coordinateToLogical:x=>x,logicalToCoordinate:x=>x};
- const chart={timeScale:()=>ts,addSeries(){const s={setData(data){this.data=data;if(clobber)range={from:-999,to:999};},applyOptions(){},createPriceLine(){return {};},removePriceLine(){},coordinateToPrice:y=>y,priceToCoordinate:p=>p};series.push(s);return s;},subscribeCrosshairMove(){},subscribeClick(){},remove(){}};
+ const chart={applyOptions(o){applied.push(o)},priceScale(){return {applyOptions(o){scales.push(o)}}},timeScale:()=>ts,addSeries(){const s={setData(data){this.data=data;if(clobber)range={from:-999,to:999};},applyOptions(){},createPriceLine(){return {};},removePriceLine(){},coordinateToPrice:y=>y,priceToCoordinate:p=>p};series.push(s);return s;},subscribeCrosshairMove(){},subscribeClick(){},remove(){}};
  function node(){return {style:{},classList:{add(){}},setAttribute(){},appendChild(){},replaceChildren(){},querySelectorAll:()=>[],getBoundingClientRect:()=>({left:0,top:0})};}
  const host={clientWidth:1000,clientHeight:500,ownerDocument:{createElementNS:node},appendChild(n){this.svg=n;}};
  const context={window:{BacktestFrames:Frames,BacktestDrawingSuite:{geometry:()=>[],spec:()=>({points:2}),validate:()=>true,available:()=>true},LightweightCharts:{createChart:()=>chart,CandlestickSeries:{},LineSeries:{},CrosshairMode:{Normal:0},LineStyle:{Dashed:1}}},document:{body:{}},getComputedStyle:()=>({getPropertyValue:()=> '#111111'}),requestAnimationFrame:()=>1,cancelAnimationFrame(){}};
  vm.runInNewContext(fs.readFileSync(require.resolve('../assets/backtest-chart.js'),'utf8'),context);
  const view=new context.window.BacktestChart(host,()=>{},()=>{});
- return {view,host,series,range:()=>({...range}),setRange:r=>{range={...r};},clobber:()=>{clobber=true;}};
+ return {view,host,series,applied,scales,range:()=>({...range}),setRange:r=>{range={...r};},clobber:()=>{clobber=true;}};
 }
 function session(){return {id:'test',symbol:'EURUSD',interval:'1H',candles:Array.from({length:100},(_,i)=>({t:1704067200+i*3600,o:100,h:101,l:99,c:100})),cursor:39,drawings:[],annotations:[],trades:[]};}
 test('replay preserves a manually panned range even if setData adjusts the scale',()=>{
@@ -62,3 +62,8 @@ test('context pointer uses chart price precision and a right click cannot start 
  assert.equal(h.view.atPointer({clientX:999,clientY:120}),null);
  h.view.tool('brush');assert.doesNotThrow(()=>h.host.svg.onpointerdown({button:2}));assert.equal(s.annotations.length,0);
 });
+
+test('terminal navigation pans by viewport width and reset never changes replay state',()=>{const h=harness(),s=session();h.view.render(s,false,30);const before=JSON.stringify(s);h.setRange({from:5,to:25});h.view.pan(-.2);assert.deepEqual(h.range(),{from:1,to:21});h.view.configure({log:true,auto:false});assert.equal(h.scales.at(-1).mode,1);h.view.reset();assert.deepEqual(h.range(),{from:-120,to:48});assert.equal(h.scales.at(-1).autoScale,true);assert.equal(JSON.stringify(s),before);});
+test('appearance validates input and survives replay updates without changing candles',()=>{const h=harness(),s=session();h.view.render(s,false,30);const before=JSON.stringify(s.candles);h.view.configure({grid:false,priceLine:false,upColor:'#123456',crosshairStyle:'solid',bgColor:'bad'});assert.equal(h.applied.at(-1).grid.vertLines.color,'transparent');assert.equal(h.view.configure().bgColor,'');s.cursor++;h.view.render(s,false,30);assert.equal(h.view.configure().upColor,'#123456');assert.equal(h.view.configure().priceLine,false);assert.equal(JSON.stringify(s.candles),before);});
+
+test('reading settings and advancing replay never re-enables autoscaling after manual price navigation',()=>{const h=harness(),s=session();h.view.render(s,false,30);h.view.configure({auto:false});const before=h.scales.length;assert.equal(h.view.configure().auto,false);assert.equal(h.scales.length,before);s.cursor++;h.view.render(s,false,30);assert.equal(h.scales.length,before);h.view.reset();assert.equal(h.scales.at(-1).autoScale,true);});

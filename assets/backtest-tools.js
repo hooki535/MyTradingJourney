@@ -2,12 +2,12 @@
 (() => {
  'use strict';
  const Suite=window.BacktestDrawingSuite,icon=window.BacktestIcons.svg;
- const order=['lines','fib','patterns','positions','shapes','notes','icons'];
+ const order=['lines','fib','shapes','notes','patterns','positions','icons'];
  const groups=Suite.groups.map(g=>[...g.slice(0,3),g[3].map(t=>[...t])]).sort((a,b)=>order.indexOf(a[0])-order.indexOf(b[0]));
  const move=(tool,to)=>{const group=groups.find(g=>g[3].some(t=>t[0]===tool));if(!group)return;const row=group[3].find(t=>t[0]===tool);group[3]=group[3].filter(t=>t[0]!==tool);groups.find(g=>g[0]===to)[3].push(row);};
- move('avwap','positions');for(const id of ['arrow','arrowmarker','arrowleft','arrowright','arrowup','arrowdown'])move(id,'shapes');
+
  const sectionOrder={lines:[['TREND LINES',['trend','ray','info','extended','angle','horizontal','horizontalray','vertical','crossline']],['CHANNELS',['channel','regression','flattop','disjoint']]],positions:[['PROJECTION',['long','short','forecast','barspattern','ghostfeed','projection']],['VOLUME-BASED',['avwap','volumeprofile']],['MEASURER',['pricerange','daterange','measure']]],shapes:[['BRUSHES',['brush','highlighter']],['ARROWS',['arrow','arrowmarker','arrowleft','arrowright','arrowup','arrowdown']],['SHAPES',['rectangle','rotatedrect','path','circle','ellipse','polyline','triangle','arc','curve','doublecurve']]]};
- function menuRows(group,tools){if(!sectionOrder[group])return tools.map(([id,label])=>toolRow(id,label)).join('');const rows=new Map(tools.map(t=>[t[0],t]));return sectionOrder[group].map(([label,ids])=>'<div class="bt-tv-section-label">'+label+'</div>'+ids.filter(id=>rows.has(id)).map(id=>toolRow(id,rows.get(id)[1])).join('')).join('');}
+ function menuRows(group,tools){return tools.map(([id,label])=>toolRow(id,label)).join('');}
 
  const shortcuts={trend:'Alt + T',horizontal:'Alt + H',horizontalray:'Alt + J',vertical:'Alt + V',crossline:'Alt + C',fib:'Alt + F'};
  let remembered={},favorites=[],layoutPrefs={show:true};
@@ -70,4 +70,3 @@
  }
  window.BacktestTools={rail,mount,selected,closeMenus,editableText,activeTool};
 })();
-
