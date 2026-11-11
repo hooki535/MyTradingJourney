@@ -180,7 +180,10 @@
         if (!(fill > 0 && (long ? p.stop < fill && fill < p.target : p.target < fill && fill < p.stop))) {
           s.pending=null; s.notice='Order rejected: the opening gap/slippage crossed the stop or target.';
         } else {
-          s.position={...p, entry:fill, entryTime:bar.t, riskCash:Math.abs(fill-p.stop)*p.quantity*cashMultiplier(s,p.stop)+2*s.fee*p.quantity};
+          // Entry slippage is already in fill; include the configured stop-exit
+          // slippage and convert at that exit, just as closePosition does.
+          const stopExit=Math.max(Number.EPSILON,p.stop-(long?1:-1)*s.slippage);
+          s.position={...p, entry:fill, entryTime:bar.t, riskCash:Math.abs(fill-stopExit)*p.quantity*cashMultiplier(s,stopExit)+2*s.fee*p.quantity};
           s.pending=null; s.balance -= s.fee*p.quantity;
           // With an intrabar entry, a target touch may have preceded the fill.
           // Do not award it; stops still apply conservatively.
