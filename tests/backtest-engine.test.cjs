@@ -102,3 +102,17 @@ test('CSV does not silently normalize impossible calendar dates',()=>{
 test('negative account equity cannot fund a fresh simulated position',()=>{
  const s=session();s.balance=-1;assert.throws(()=>order(s),/positive equity/);
 });
+
+test('ordinary stop losses equal original risk including exit slippage and fees',()=>{
+ for(const side of ['long','short'])for(const fxMode of ['fixed','inverse']){
+  const s=session({symbol:'USDJPY',fxMode,multiplier:10,fee:.1,slippage:.5});
+  order(s,{side,quantity:2,stop:side==='long'?90:110,target:side==='long'?120:80});E.step(s);
+  const risk=s.position.riskCash,raw=E.snapshot(s);
+  const copy=E.restore(raw);assert.equal(copy.position.riskCash,risk);
+  for(const run of [s,copy]){
+   run.candles[31]={t:run.candles[31].t,o:100,h:111,l:89,c:100};E.step(run);
+   const trade=run.trades[0];assert.ok(Math.abs(trade.pnl+risk)<1e-9);
+   assert.ok(Math.abs(trade.r+1)<1e-9);assert.ok(Math.abs(run.balance-(run.startBalance+trade.pnl))<1e-9);
+  }
+ }
+});
